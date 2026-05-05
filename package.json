@@ -19,7 +19,8 @@
     "test:watch": "vitest",
     "lint": "biome check src tests",
     "lint:fix": "biome check --write src tests",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "smoke": "tsx scripts/smoke-wsaa.ts"
   },
   "keywords": [
     "mcp",
