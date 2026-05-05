@@ -121,6 +121,21 @@ describe('getPersona', () => {
     await expect(promise).rejects.toMatchObject({ code: 'NOT_FOUND' });
   });
 
+  it('throws PadronError with code NOT_FOUND on "La Clave (CUIT/CUIL) consultada es inexistente" fault', async () => {
+    const fault = makeFault(
+      '<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
+        '<soap:Body><soap:Fault><faultcode>soap:Server</faultcode>' +
+        '<faultstring>La Clave (CUIT/CUIL) consultada es inexistente: {"SRValidationException":null}</faultstring>' +
+        '</soap:Fault></soap:Body></soap:Envelope>',
+      'La Clave (CUIT/CUIL) consultada es inexistente: {"SRValidationException":null}',
+    );
+    getPersonaAsyncMock.mockRejectedValue(fault);
+    const { getPersona } = await import('../../src/padron/client.js');
+    const promise = getPersona('20999999990', makeConfig());
+    await expect(promise).rejects.toBeInstanceOf(PadronError);
+    await expect(promise).rejects.toMatchObject({ code: 'NOT_FOUND' });
+  });
+
   it('throws PadronError with code AUTH_FAILED on token-related faults', async () => {
     const fault = makeFault(
       '<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
