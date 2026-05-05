@@ -67,9 +67,7 @@ function makeFisica(overrides: Partial<PersonaFisicaPadron> = {}): PersonaFisica
   };
 }
 
-function makeJuridica(
-  overrides: Partial<PersonaJuridicaPadron> = {},
-): PersonaJuridicaPadron {
+function makeJuridica(overrides: Partial<PersonaJuridicaPadron> = {}): PersonaJuridicaPadron {
   return {
     tipoPersona: 'JURIDICA',
     cuit: '30711111119',

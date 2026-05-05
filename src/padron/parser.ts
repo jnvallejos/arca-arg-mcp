@@ -151,10 +151,7 @@ export function parsePadronResponse(xml: string): PersonaPadron {
 
   const raw = findPersona(parsed);
   if (!raw) {
-    throw new PadronError(
-      'UNKNOWN',
-      'Padrón response did not contain a <persona> element.',
-    );
+    throw new PadronError('UNKNOWN', 'Padrón response did not contain a <persona> element.');
   }
 
   const tipoPersona = tipoPersonaSchema.safeParse(raw.tipoPersona);
@@ -166,16 +163,11 @@ export function parsePadronResponse(xml: string): PersonaPadron {
   }
 
   const candidate =
-    tipoPersona.data === 'FISICA'
-      ? buildPersonaFisica(raw)
-      : buildPersonaJuridica(raw);
+    tipoPersona.data === 'FISICA' ? buildPersonaFisica(raw) : buildPersonaJuridica(raw);
 
   const result = personaSchema.safeParse(candidate);
   if (!result.success) {
-    throw new PadronError(
-      'UNKNOWN',
-      `Padrón response failed validation: ${result.error.message}`,
-    );
+    throw new PadronError('UNKNOWN', `Padrón response failed validation: ${result.error.message}`);
   }
   return result.data;
 }
@@ -205,10 +197,7 @@ function findPersona(node: unknown): RawPersona | null {
 }
 
 function isPersonaShape(obj: Record<string, unknown>): boolean {
-  return (
-    typeof obj.idPersona === 'string' &&
-    typeof obj.tipoPersona === 'string'
-  );
+  return typeof obj.idPersona === 'string' && typeof obj.tipoPersona === 'string';
 }
 
 function buildPersonaFisica(raw: RawPersona) {

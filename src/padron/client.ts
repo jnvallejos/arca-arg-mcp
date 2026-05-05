@@ -27,10 +27,7 @@ interface SoapErrorLike {
  * failure the error is mapped to a {@link PadronError} with a discriminated
  * `code` so callers can branch without parsing message text.
  */
-export async function getPersona(
-  cuitToQuery: string,
-  config: ArcaConfig,
-): Promise<PersonaPadron> {
+export async function getPersona(cuitToQuery: string, config: ArcaConfig): Promise<PersonaPadron> {
   const ta = await getValidToken(config, PADRON_SERVICE);
 
   const wsdlUrl = `${PADRON_ENDPOINTS[config.env]}?wsdl`;
@@ -46,9 +43,11 @@ export async function getPersona(
 
   let raw: unknown;
   try {
-    const fn = (client as unknown as {
-      getPersonaAsync: (args: unknown) => Promise<unknown>;
-    }).getPersonaAsync;
+    const fn = (
+      client as unknown as {
+        getPersonaAsync: (args: unknown) => Promise<unknown>;
+      }
+    ).getPersonaAsync;
     raw = await fn({
       token: ta.token,
       sign: ta.sign,
@@ -68,10 +67,7 @@ export async function getPersona(
     return parsePadronResponse(rawResponse);
   } catch (err) {
     if (err instanceof PadronError) throw err;
-    throw new PadronError(
-      'UNKNOWN',
-      `Could not parse Padrón response: ${(err as Error).message}`,
-    );
+    throw new PadronError('UNKNOWN', `Could not parse Padrón response: ${(err as Error).message}`);
   }
 }
 

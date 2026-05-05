@@ -59,9 +59,7 @@ describe('arca_consultar_cuit tool', () => {
 
   it('rejects CUIT shorter than 11 digits', async () => {
     const { handleArcaConsultarCuit } = await import('../../src/tools/arca-consultar-cuit.js');
-    await expect(
-      handleArcaConsultarCuit(makeConfig(), { cuit: '2011111' }),
-    ).rejects.toThrow();
+    await expect(handleArcaConsultarCuit(makeConfig(), { cuit: '2011111' })).rejects.toThrow();
     expect(getPersonaMock).not.toHaveBeenCalled();
   });
 
@@ -75,9 +73,7 @@ describe('arca_consultar_cuit tool', () => {
 
   it('rejects non-numeric CUIT', async () => {
     const { handleArcaConsultarCuit } = await import('../../src/tools/arca-consultar-cuit.js');
-    await expect(
-      handleArcaConsultarCuit(makeConfig(), { cuit: '2011111111A' }),
-    ).rejects.toThrow();
+    await expect(handleArcaConsultarCuit(makeConfig(), { cuit: '2011111111A' })).rejects.toThrow();
     expect(getPersonaMock).not.toHaveBeenCalled();
   });
 

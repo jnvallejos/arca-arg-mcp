@@ -102,9 +102,7 @@ function formatCategoria(c: CategoriaMonotributo): string {
 }
 
 function pickFiscalDomicilio(domicilios: DomicilioPadron[]): DomicilioPadron | undefined {
-  return (
-    domicilios.find((d) => d.tipoDomicilio.toUpperCase() === 'FISCAL') ?? domicilios[0]
-  );
+  return domicilios.find((d) => d.tipoDomicilio.toUpperCase() === 'FISCAL') ?? domicilios[0];
 }
 
 function formatCp(codPostal: string): string {
