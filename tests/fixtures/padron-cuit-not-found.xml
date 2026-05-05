@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <soap:Fault>
+      <faultcode>soap:Server</faultcode>
+      <faultstring>No existe persona con ese Id</faultstring>
+      <detail>
+        <exception>
+          <name>sr.padron.idPersonaNoExiste</name>
+        </exception>
+      </detail>
+    </soap:Fault>
+  </soap:Body>
+</soap:Envelope>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <ns2:getPersonaResponse xmlns:ns2="http://a13.soap.ws.server.puc.sr/">
+      <personaReturn>
+        <persona>
+          <idPersona>20222222226</idPersona>
+          <tipoPersona>FISICA</tipoPersona>
+          <tipoClave>CUIT</tipoClave>
+          <estadoClave>BAJA</estadoClave>
+          <nombre>JUANA</nombre>
+          <apellido>GOMEZ</apellido>
+        </persona>
+      </personaReturn>
+    </ns2:getPersonaResponse>
+  </soap:Body>
+</soap:Envelope>

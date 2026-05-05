@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <ns2:getPersonaResponse xmlns:ns2="http://a13.soap.ws.server.puc.sr/">
+      <personaReturn>
+        <persona>
+          <idPersona>20111111112</idPersona>
+          <tipoPersona>FISICA</tipoPersona>
+          <tipoClave>CUIT</tipoClave>
+          <estadoClave>ACTIVO</estadoClave>
+          <nombre>JUAN</nombre>
+          <apellido>PEREZ</apellido>
+          <tipoDocumento>DNI</tipoDocumento>
+          <numeroDocumento>11111111</numeroDocumento>
+          <fechaNacimiento>1990-01-15</fechaNacimiento>
+          <mesCierre>12</mesCierre>
+          <domicilio>
+            <direccion>CALLE FALSA 123</direccion>
+            <localidad>CABA</localidad>
+            <codPostal>1437</codPostal>
+            <descripcionProvincia>CIUDAD AUTONOMA DE BUENOS AIRES</descripcionProvincia>
+            <tipoDomicilio>FISCAL</tipoDomicilio>
+            <estado>ACTIVO</estado>
+          </domicilio>
+          <actividad>
+            <idActividad>620100</idActividad>
+            <descripcionActividad>SERVICIOS DE CONSULTORES EN INFORMATICA Y SUMINISTROS DE PROGRAMAS DE INFORMATICA</descripcionActividad>
+            <periodo>202101</periodo>
+            <orden>1</orden>
+            <nomenclador>883</nomenclador>
+          </actividad>
+          <impuesto>
+            <idImpuesto>20</idImpuesto>
+            <descripcionImpuesto>GANANCIAS PERSONAS FISICAS</descripcionImpuesto>
+            <periodo>202101</periodo>
+            <estado>ACTIVO</estado>
+          </impuesto>
+          <categoria>
+            <descripcionCategoria>MONOTRIBUTO CATEGORIA B</descripcionCategoria>
+            <periodo>202401</periodo>
+          </categoria>
+        </persona>
+      </personaReturn>
+    </ns2:getPersonaResponse>
+  </soap:Body>
+</soap:Envelope>
