@@ -85,7 +85,12 @@ export function parseTaResponse(xml: string, service: ServiceName): TA {
 
   const credentials = response.credentials;
   const header = response.header;
-  if (!credentials?.token || !credentials.sign || !header?.generationTime || !header.expirationTime) {
+  if (
+    !credentials?.token ||
+    !credentials.sign ||
+    !header?.generationTime ||
+    !header.expirationTime
+  ) {
     throw new WsaaError(
       'wsaa.malformedResponse',
       'WSAA response is missing required token, sign, or timestamp fields.',

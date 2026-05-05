@@ -138,9 +138,7 @@ describe('getValidToken', () => {
   it('passes the correct service name through to the TRA → CMS → WSAA pipeline', async () => {
     readTaMock.mockResolvedValue(null);
     callLoginCmsMock.mockResolvedValue('<xml>raw</xml>');
-    parseTaResponseMock.mockImplementation((_xml: string, service: string) =>
-      makeTa({ service }),
-    );
+    parseTaResponseMock.mockImplementation((_xml: string, service: string) => makeTa({ service }));
 
     const result = await getValidToken(config, 'ws_sr_padron_a13');
     expect(result.service).toBe('ws_sr_padron_a13');

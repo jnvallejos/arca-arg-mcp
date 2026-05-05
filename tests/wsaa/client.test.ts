@@ -67,9 +67,7 @@ describe('callLoginCms', () => {
   });
 
   it('throws WsaaError with code "invalidSignature" on that fault', async () => {
-    loginCmsAsyncMock.mockRejectedValue(
-      makeSoapFault('coe.invalidSignature', 'Bad signature'),
-    );
+    loginCmsAsyncMock.mockRejectedValue(makeSoapFault('coe.invalidSignature', 'Bad signature'));
     await expect(callLoginCms('cms', 'https://wsaa/endpoint')).rejects.toMatchObject({
       code: 'coe.invalidSignature',
     });
@@ -84,9 +82,7 @@ describe('callLoginCms', () => {
 
   it('throws WsaaError when loginCmsReturn is missing from the SOAP response', async () => {
     loginCmsAsyncMock.mockResolvedValue([{}]);
-    await expect(callLoginCms('cms', 'https://wsaa/endpoint')).rejects.toBeInstanceOf(
-      WsaaError,
-    );
+    await expect(callLoginCms('cms', 'https://wsaa/endpoint')).rejects.toBeInstanceOf(WsaaError);
   });
 });
 

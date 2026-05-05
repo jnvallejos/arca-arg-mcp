@@ -1,4 +1,4 @@
-import { accessSync, constants } from 'node:fs';
+import { constants, accessSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { z } from 'zod';
@@ -80,8 +80,7 @@ function assertReadable(path: string, varName: string): void {
     accessSync(path, constants.R_OK);
   } catch {
     throw new ConfigError(
-      `${varName}: file at ${path} does not exist or is not readable. ` +
-        'Verify the path and the file permissions.',
+      `${varName}: file at ${path} does not exist or is not readable. Verify the path and the file permissions.`,
     );
   }
 }

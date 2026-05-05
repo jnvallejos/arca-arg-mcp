@@ -5,7 +5,13 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { loadConfig } from '../../src/config/env.js';
 import { ConfigError } from '../../src/lib/errors.js';
 
-const REQUIRED_VARS = ['ARCA_ENV', 'ARCA_CUIT', 'ARCA_CERT_PATH', 'ARCA_KEY_PATH', 'ARCA_CACHE_DIR'];
+const REQUIRED_VARS = [
+  'ARCA_ENV',
+  'ARCA_CUIT',
+  'ARCA_CERT_PATH',
+  'ARCA_KEY_PATH',
+  'ARCA_CACHE_DIR',
+];
 
 describe('loadConfig', () => {
   let tmpDir: string;

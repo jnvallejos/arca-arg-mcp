@@ -7,10 +7,7 @@ const ARG_OFFSET_MS = 3 * 60 * 60 * 1000;
  * Builds a TRA (Ticket de Requerimiento de Acceso) for the requested service.
  * Returns both the structured TRA and the serialized XML ready to sign.
  */
-export function buildTra(
-  service: ServiceName,
-  now: Date = new Date(),
-): { tra: TRA; xml: string } {
+export function buildTra(service: ServiceName, now: Date = new Date()): { tra: TRA; xml: string } {
   const generationTime = new Date(now.getTime());
   const expirationTime = new Date(now.getTime() + TRA_VALIDITY_MS);
 
@@ -21,16 +18,16 @@ export function buildTra(
     service,
   };
 
-  const xml =
-    '<?xml version="1.0" encoding="UTF-8"?>\n' +
-    '<loginTicketRequest version="1.0">\n' +
-    '  <header>\n' +
-    `    <uniqueId>${tra.uniqueId}</uniqueId>\n` +
-    `    <generationTime>${formatArgTime(generationTime)}</generationTime>\n` +
-    `    <expirationTime>${formatArgTime(expirationTime)}</expirationTime>\n` +
-    '  </header>\n' +
-    `  <service>${escapeXml(service)}</service>\n` +
-    '</loginTicketRequest>\n';
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<loginTicketRequest version="1.0">
+  <header>
+    <uniqueId>${tra.uniqueId}</uniqueId>
+    <generationTime>${formatArgTime(generationTime)}</generationTime>
+    <expirationTime>${formatArgTime(expirationTime)}</expirationTime>
+  </header>
+  <service>${escapeXml(service)}</service>
+</loginTicketRequest>
+`;
 
   return { tra, xml };
 }

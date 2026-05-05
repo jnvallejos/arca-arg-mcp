@@ -7,11 +7,7 @@ import { ArcaError } from '../lib/errors.js';
  *
  * The output is what WSAA's `loginCms` SOAP method expects as `in0`.
  */
-export async function signCms(
-  xml: string,
-  certPem: string,
-  keyPem: string,
-): Promise<string> {
+export async function signCms(xml: string, certPem: string, keyPem: string): Promise<string> {
   const certificate = parseCertificate(certPem);
   const privateKey = parsePrivateKey(keyPem);
 
@@ -19,13 +15,14 @@ export async function signCms(
   p7.content = forge.util.createBuffer(xml, 'utf8');
   p7.addCertificate(certificate);
   p7.addSigner({
-    key: privateKey,
+    key: privateKey as forge.pki.rsa.PrivateKey,
     certificate,
     digestAlgorithm: forge.pki.oids.sha256,
     authenticatedAttributes: [
       { type: forge.pki.oids.contentType, value: forge.pki.oids.data },
       { type: forge.pki.oids.messageDigest },
-      { type: forge.pki.oids.signingTime, value: new Date() },
+      // node-forge accepts Date here at runtime, but @types/node-forge narrows to string.
+      { type: forge.pki.oids.signingTime, value: new Date() as unknown as string },
     ],
   });
   p7.sign({ detached: false });
