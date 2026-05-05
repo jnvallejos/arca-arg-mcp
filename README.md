@@ -22,14 +22,244 @@ MCP (Model Context Protocol) server for Argentine tax compliance. Exposes ARCA (
 - [ ] Phase 4 — WSFEX (Factura E)
 - [ ] Phase 5 — Release v1.0.0
 
+## Why this exists
+
+ARCA's web services are SOAP, idiosyncratic, and badly documented — every Argentine
+developer who has ever needed to invoice from code has rediscovered the same edge cases
+the hard way. This project wraps them as MCP tools so an LLM (or any MCP client) can
+drive them with a clean, typed interface, instead of every team rebuilding the same
+auth and signing layer from scratch.
+
+## Prerequisites
+
+- **Node.js 20** or higher
+- **`openssl`** available on your `PATH` (preinstalled on macOS and most Linux
+  distributions; on Windows install via Git Bash, WSL, or a native package such as
+  the Win32 OpenSSL binaries)
+- A valid **AFIP / ARCA Clave Fiscal** — the same login a real Argentine taxpayer
+  uses to access the ARCA portal
+
+## Quick start
+
+For readers who already have a CUIT and an ARCA-issued certificate:
+
+```bash
+git clone https://github.com/jnvallejos/arca-arg-mcp.git
+cd arca-arg-mcp
+npm install
+npm run build
+# After completing "Obtaining ARCA test credentials" below:
+ARCA_ENV=homologation \
+ARCA_CUIT=<your-cuit> \
+ARCA_CERT_PATH=<path-to-cert.pem> \
+ARCA_KEY_PATH=<path-to-private.key> \
+npm run smoke
+```
+
+If `npm run smoke` prints `Smoke test PASSED`, you're ready to wire it up to a client.
+See **Using with Claude Desktop** below.
+
+## Obtaining ARCA test credentials
+
+Authenticating against ARCA requires an X.509 certificate that ARCA itself issues to
+your CUIT. The flow below walks through the homologation (test) environment end to
+end. Production follows the same shape but uses different ARCA portals; do not
+attempt production until homologation works.
+
+The certificate self-service portal is called **WSASS** (*Web Services Autogestión
+de Certificados*). All ARCA UI labels are in Spanish; URLs and button names below
+are reproduced verbatim.
+
+### 1. Generate an RSA private key
+
+In a directory you control (suggested: `~/.arca/homo/`):
+
+```bash
+mkdir -p ~/.arca/homo && cd ~/.arca/homo
+openssl genrsa -out private.key 2048
+chmod 600 private.key
+```
+
+The key is yours; never upload it, never commit it, never share it.
+
+### 2. Generate a Certificate Signing Request (CSR)
+
+```bash
+openssl req -new -key private.key \
+  -subj "/C=AR/O=Your Name/CN=arca-arg-mcp/serialNumber=CUIT XXXXXXXXXXX" \
+  -out request.csr
+```
+
+Replace:
+
+- `Your Name` with your full legal name (or your company name if you're using a
+  company CUIT)
+- `XXXXXXXXXXX` with your 11-digit CUIT, no dashes or spaces
+- The `CN` (`arca-arg-mcp`) is just an alias and can be any alphanumeric value
+
+The `serialNumber=CUIT XXXXXXXXXXX` format with a literal space between `CUIT` and
+the digits is **required by ARCA**. Do not reformat it.
+
+### 3. Adhere to the WSASS service
+
+WSASS is opt-in. You enable it once per Clave Fiscal.
+
+1. Open <https://www.arca.gob.ar>
+2. Click **"Acceso con Clave Fiscal"** and log in with your Clave Fiscal
+3. From the service list, click **"ARCA"**, then **"Servicios Interactivos"**, then
+   **"WSASS — Autogestión Certificados Homologación"**
+4. If the service is not listed: open **"Administrador de Relaciones de Clave
+   Fiscal"** (also from the main service list), click **ADHERIR SERVICIO**, click
+   the **ARCA** button, then **Servicios Interactivos**, locate **"WSASS —
+   Autogestión Certificados Homologación"**, and confirm the authorization
+5. Log out and back in — the service appears in the menu only after re-authentication
+
+### 4. Create a DN and submit the CSR
+
+Inside WSASS:
+
+1. Click **Nuevo Certificado**
+2. **Nombre simbólico del DN:** any alphanumeric alias (no dashes, no spaces).
+   Suggestion: `arcaargmcphomo`
+3. **CUIT del contribuyente:** prefilled with your CUIT
+4. **Solicitud de certificado en formato PKCS#10:** paste the entire content of
+   `request.csr` (including the `-----BEGIN CERTIFICATE REQUEST-----` and
+   `-----END CERTIFICATE REQUEST-----` lines)
+5. Click **Crear DN y obtener certificado**
+
+ARCA returns a PEM-formatted X.509 certificate in the **Resultado** box. Copy the
+entire block, including the `-----BEGIN CERTIFICATE-----` /
+`-----END CERTIFICATE-----` lines.
+
+### 5. Save the certificate
+
+```bash
+cd ~/.arca/homo
+# Paste content into cert.pem using your editor of choice, or with a heredoc:
+cat > cert.pem << 'EOF'
+-----BEGIN CERTIFICATE-----
+... paste here ...
+-----END CERTIFICATE-----
+EOF
+chmod 644 cert.pem
+```
+
+### 6. Authorize the certificate for a web service
+
+WSASS distinguishes between **owning a certificate** and **authorizing it to talk
+to a specific web service**. You must do both.
+
+Inside WSASS:
+
+1. Click **Crear autorización a servicio**
+2. **Nombre simbólico del DN a autorizar:** select the alias you created in step 4
+3. **CUIT representado:** your own CUIT
+4. **Servicio al que desea acceder:** for the smoke test, choose
+   **`wsfe — Factura electrónica`**
+5. Click **Crear autorización de acceso**
+
+You should see *"OK. Autorización fue creada (...)"*. The certificate is now
+authorized to authenticate against WSAA for the `wsfe` service in homologation.
+
+## Configuration
+
+The server reads these environment variables at startup:
+
+| Variable          | Required | Example                          | Notes                                                           |
+| ----------------- | -------- | -------------------------------- | --------------------------------------------------------------- |
+| `ARCA_ENV`        | Yes      | `homologation` or `production`   | Selects the WSAA endpoint. No default; explicit choice required |
+| `ARCA_CUIT`       | Yes      | `20111111112`                    | 11-digit CUIT, no dashes, no spaces                             |
+| `ARCA_CERT_PATH`  | Yes      | `~/.arca/homo/cert.pem`          | Absolute, relative, or `~`-prefixed path; resolved at startup   |
+| `ARCA_KEY_PATH`   | Yes      | `~/.arca/homo/private.key`       | Same rules as `ARCA_CERT_PATH`                                  |
+| `ARCA_CACHE_DIR`  | No       | `~/.arca-arg-mcp/cache`          | Where TA cache files are stored (default shown)                 |
+
+The cert and key files must exist and be readable at startup. The CUIT is validated
+for format only (11 numeric digits). The CUIT check digit is not validated here;
+that's confirmed by ARCA itself when the first authentication call succeeds.
+
+## Running the smoke test
+
+The smoke script exercises the full WSAA flow against ARCA homologation: build TRA,
+sign with PKCS#7 / CMS, call `loginCms`, parse the TA, and write it to disk.
+
+```bash
+ARCA_ENV=homologation \
+ARCA_CUIT=20111111112 \
+ARCA_CERT_PATH=~/.arca/homo/cert.pem \
+ARCA_KEY_PATH=~/.arca/homo/private.key \
+npm run smoke
+```
+
+Expected output: a multi-line summary ending in `Smoke test PASSED`. The first run
+writes a TA to `~/.arca-arg-mcp/cache/ta-<cuit>-wsfe.json`. Subsequent runs (within
+~12 hours) reuse the cache and complete in milliseconds. To force a fresh
+authentication, delete the cache file.
+
+The script never prints the `token` or `sign` strings — only their lengths.
+
+### Common failures
+
+- `ConfigError: ARCA_CERT_PATH: file at ... does not exist or is not readable.`
+  Fix the path. Tilde (`~`) expansion only works for `~/...`, not `~user/...`.
+- `WsaaError: coe.invalidSignature: ...` — the cert and key don't match, or you
+  submitted a CSR generated from a different key. Regenerate the key + CSR + cert.
+- `WsaaError: <unauthorized service>` — the cert is valid but not authorized for
+  `wsfe`. Repeat step 6 of **Obtaining ARCA test credentials**.
+
+## Using with Claude Desktop
+
+Add the server to Claude Desktop's MCP config
+(`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS;
+equivalent path on Linux/Windows):
+
+```json
+{
+  "mcpServers": {
+    "arca-arg-mcp": {
+      "command": "node",
+      "args": ["/absolute/path/to/arca-arg-mcp/dist/index.js"],
+      "env": {
+        "ARCA_ENV": "homologation",
+        "ARCA_CUIT": "20111111112",
+        "ARCA_CERT_PATH": "/absolute/path/to/cert.pem",
+        "ARCA_KEY_PATH": "/absolute/path/to/private.key"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop. The available tools (`ping`, `arca_status`, plus whatever
+future phases add) will appear in the chat UI.
+
 ## Development
 
 Requires Node.js 20+.
 
 ```bash
-npm install
-npm test
-npm run build
+npm install            # install deps
+npm test               # run the full Vitest suite
+npm run lint           # Biome lint (zero-warning policy)
+npm run typecheck      # strict TypeScript check
+npm run build          # compile to dist/
+npm run smoke          # end-to-end WSAA verification (real credentials required)
+```
+
+`npm run smoke` is **not** wired into CI — it requires a real ARCA-issued
+certificate. CI runs unit and integration tests only.
+
+## Project structure
+
+```
+arca-arg-mcp/
+├── docs/             phase-by-phase implementation specs
+├── scripts/          developer-only scripts (e.g. smoke-wsaa.ts)
+├── src/
+│   ├── config/       env loading and ARCA endpoint table
+│   ├── lib/          shared utilities (logging, paths, errors)
+│   ├── tools/        MCP tool handlers (ping, arca_status, ...)
+│   └── wsaa/         WSAA auth: TRA build, CMS signing, SOAP client, TA cache
+└── tests/            Vitest unit and integration tests, mirroring src/
 ```
 
 ## License
