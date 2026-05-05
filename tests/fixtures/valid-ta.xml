@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<loginTicketResponse version="1.0">
+  <header>
+    <source>CN=wsaahomo, O=AFIP, C=AR, SERIALNUMBER=CUIT 33693450239</source>
+    <destination>SERIALNUMBER=CUIT 20000000000, CN=test, O=Test Org, C=AR</destination>
+    <uniqueId>1714824000</uniqueId>
+    <generationTime>2026-05-04T12:00:00.000-03:00</generationTime>
+    <expirationTime>2026-05-05T00:00:00.000-03:00</expirationTime>
+  </header>
+  <credentials>
+    <token>FAKE-TOKEN-FOR-TESTING-NOT-A-REAL-WSAA-TOKEN</token>
+    <sign>FAKE-SIGN-FOR-TESTING-NOT-A-REAL-WSAA-SIGN</sign>
+  </credentials>
+</loginTicketResponse>
