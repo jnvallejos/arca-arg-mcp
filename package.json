@@ -1,0 +1,53 @@
+{
+  "name": "arca-arg-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Argentine tax compliance with ARCA (ex-AFIP) web services",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "arca-arg-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "biome check src tests",
+    "lint:fix": "biome check --write src tests",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "argentina",
+    "afip",
+    "arca",
+    "factura-electronica",
+    "claude"
+  ],
+  "author": "Javier Vallejos <https://github.com/jnvallejos>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jnvallejos/arca-arg-mcp.git"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
