@@ -16,7 +16,7 @@ MCP (Model Context Protocol) server for Argentine tax compliance. Exposes ARCA (
 ## Status
 
 - [x] Phase 0 — Project setup and MCP scaffolding
-- [ ] Phase 1 — WSAA authentication
+- [x] Phase 1 — WSAA authentication
 - [ ] Phase 2 — Padrón (CUIT lookup)
 - [ ] Phase 3 — WSFE (Factura A, B, C)
 - [ ] Phase 4 — WSFEX (Factura E)
