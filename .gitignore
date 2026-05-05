@@ -1,0 +1,29 @@
+# Build artifacts
+dist/
+*.tsbuildinfo
+
+# Coverage
+coverage/
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Env
+.env
+.env.local
+
+# ARCA-specific (never commit certs or keys, ever, even by accident)
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+arca/
+certs/
