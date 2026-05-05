@@ -35,3 +35,20 @@ export class WsaaError extends ArcaError {
     this.code = code;
   }
 }
+
+export type PadronErrorCode = 'NOT_FOUND' | 'AUTH_FAILED' | 'SERVICE_UNAVAILABLE' | 'UNKNOWN';
+
+/**
+ * Thrown when the Padrón A13 service rejects a request, returns a SOAP fault,
+ * or is otherwise unreachable. The {@link code} discriminator lets callers
+ * branch on the cause without parsing message text.
+ */
+export class PadronError extends ArcaError {
+  public readonly code: PadronErrorCode;
+
+  constructor(code: PadronErrorCode, message: string) {
+    super(message);
+    this.name = 'PadronError';
+    this.code = code;
+  }
+}

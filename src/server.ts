@@ -4,6 +4,7 @@ import { loadConfig } from './config/env.js';
 import type { ArcaConfig } from './config/types.js';
 import { WSAA_ENDPOINTS } from './config/types.js';
 import { logStderr, logStderrWarn } from './lib/log.js';
+import { arcaConsultarCuitTool, handleArcaConsultarCuit } from './tools/arca-consultar-cuit.js';
 import { arcaStatusTool, handleArcaStatus } from './tools/arca-status.js';
 import { handlePing, pingTool } from './tools/ping.js';
 
@@ -24,7 +25,7 @@ export function createServer(): Server {
   );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: [pingTool, arcaStatusTool],
+    tools: [pingTool, arcaStatusTool, arcaConsultarCuitTool],
   }));
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -35,6 +36,8 @@ export function createServer(): Server {
         return handlePing(args);
       case 'arca_status':
         return handleArcaStatus(config, args);
+      case 'arca_consultar_cuit':
+        return handleArcaConsultarCuit(config, args);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }

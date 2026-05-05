@@ -17,7 +17,7 @@ MCP (Model Context Protocol) server for Argentine tax compliance. Exposes ARCA (
 
 - [x] Phase 0 — Project setup and MCP scaffolding
 - [x] Phase 1 — WSAA authentication
-- [ ] Phase 2 — Padrón (CUIT lookup)
+- [x] Phase 2 — Padrón (CUIT lookup)
 - [ ] Phase 3 — WSFE (Factura A, B, C)
 - [ ] Phase 4 — WSFEX (Factura E)
 - [ ] Phase 5 — Release v1.0.0
@@ -177,10 +177,19 @@ The cert and key files must exist and be readable at startup. The CUIT is valida
 for format only (11 numeric digits). The CUIT check digit is not validated here;
 that's confirmed by ARCA itself when the first authentication call succeeds.
 
-## Running the smoke test
+## Running the smoke tests
 
-The smoke script exercises the full WSAA flow against ARCA homologation: build TRA,
-sign with PKCS#7 / CMS, call `loginCms`, parse the TA, and write it to disk.
+There are two smoke scripts, runnable individually or as a chained pair:
+
+- `npm run smoke:wsaa` — exercises the full WSAA flow against ARCA homologation:
+  build TRA, sign with PKCS#7 / CMS, call `loginCms`, parse the TA, and write it
+  to disk.
+- `npm run smoke:padron` — looks up a CUIT in the Padrón A13 web service,
+  reusing the WSAA token. Requires the certificate to be authorized for
+  `ws_sr_padron_a13` (see step 6 of **Obtaining ARCA test credentials** and pick
+  that service when authorizing).
+- `npm run smoke` — runs `smoke:wsaa` then `smoke:padron` in sequence
+  (fail-fast). Useful for a single end-to-end check after setup.
 
 ```bash
 ARCA_ENV=homologation \
@@ -190,12 +199,20 @@ ARCA_KEY_PATH=~/.arca/homo/private.key \
 npm run smoke
 ```
 
-Expected output: a multi-line summary ending in `Smoke test PASSED`. The first run
-writes a TA to `~/.arca-arg-mcp/cache/ta-<cuit>-wsfe.json`. Subsequent runs (within
-~12 hours) reuse the cache and complete in milliseconds. To force a fresh
-authentication, delete the cache file.
+The WSAA smoke writes a TA to `~/.arca-arg-mcp/cache/ta-<cuit>-wsfe.json` on
+the first run. Subsequent runs within ~12 hours reuse the cache and complete in
+milliseconds. To force a fresh authentication, delete the cache file.
 
-The script never prints the `token` or `sign` strings — only their lengths.
+By default `smoke:padron` looks up your own CUIT (every CUIT can look itself
+up). To look up a different CUIT, set `SMOKE_CUIT`:
+
+```bash
+SMOKE_CUIT=30711111119 npm run smoke:padron
+```
+
+Both scripts redact sensitive data: `smoke:wsaa` prints token / sign lengths
+only; `smoke:padron` prints field lengths and counts only — never names,
+addresses, or activity descriptions.
 
 ### Common failures
 
@@ -204,7 +221,10 @@ The script never prints the `token` or `sign` strings — only their lengths.
 - `WsaaError: coe.invalidSignature: ...` — the cert and key don't match, or you
   submitted a CSR generated from a different key. Regenerate the key + CSR + cert.
 - `WsaaError: <unauthorized service>` — the cert is valid but not authorized for
-  `wsfe`. Repeat step 6 of **Obtaining ARCA test credentials**.
+  `wsfe` (or `ws_sr_padron_a13` for `smoke:padron`). Repeat step 6 of
+  **Obtaining ARCA test credentials**, picking the service you need.
+- `PadronError: NOT_FOUND: ...` — the CUIT doesn't exist in ARCA's records.
+  Double-check `SMOKE_CUIT` (or your own `ARCA_CUIT`).
 
 ## Using with Claude Desktop
 
@@ -229,8 +249,19 @@ equivalent path on Linux/Windows):
 }
 ```
 
-Restart Claude Desktop. The available tools (`ping`, `arca_status`, plus whatever
-future phases add) will appear in the chat UI.
+Restart Claude Desktop. The available tools (`ping`, `arca_status`,
+`arca_consultar_cuit`, plus whatever future phases add) will appear in the
+chat UI.
+
+### Tools available
+
+- **`ping`** — health check; returns `pong`.
+- **`arca_status`** — reports current ARCA configuration and cached token
+  status without exposing the raw token.
+- **`arca_consultar_cuit`** — looks up a CUIT in the ARCA Padrón A13 web
+  service and returns the person's tax data (legal name / razón social,
+  estado, actividades, domicilio, condición tributaria). Useful for validating
+  a CUIT before invoicing.
 
 ## Development
 
@@ -242,22 +273,25 @@ npm test               # run the full Vitest suite
 npm run lint           # Biome lint (zero-warning policy)
 npm run typecheck      # strict TypeScript check
 npm run build          # compile to dist/
-npm run smoke          # end-to-end WSAA verification (real credentials required)
+npm run smoke          # end-to-end WSAA + Padrón verification (real credentials required)
+npm run smoke:wsaa     # WSAA smoke only
+npm run smoke:padron   # Padrón smoke only (set SMOKE_CUIT to look up a specific CUIT)
 ```
 
-`npm run smoke` is **not** wired into CI — it requires a real ARCA-issued
-certificate. CI runs unit and integration tests only.
+`npm run smoke*` scripts are **not** wired into CI — they require a real
+ARCA-issued certificate. CI runs unit and integration tests only.
 
 ## Project structure
 
 ```
 arca-arg-mcp/
 ├── docs/             phase-by-phase implementation specs
-├── scripts/          developer-only scripts (e.g. smoke-wsaa.ts)
+├── scripts/          developer-only scripts (smoke-wsaa.ts, smoke-padron.ts)
 ├── src/
 │   ├── config/       env loading and ARCA endpoint table
 │   ├── lib/          shared utilities (logging, paths, errors)
-│   ├── tools/        MCP tool handlers (ping, arca_status, ...)
+│   ├── padron/       Padrón A13 SOAP client, parser, formatter
+│   ├── tools/        MCP tool handlers (ping, arca_status, arca_consultar_cuit, ...)
 │   └── wsaa/         WSAA auth: TRA build, CMS signing, SOAP client, TA cache
 └── tests/            Vitest unit and integration tests, mirroring src/
 ```

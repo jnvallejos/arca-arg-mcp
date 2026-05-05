@@ -43,6 +43,37 @@ WSAA returns when a CEE already has a valid TA for the requested service. Used
 to exercise the fault-handling path in `src/wsaa/client.ts` and the retry path
 in `src/wsaa/auth.ts`.
 
+## `padron-persona-fisica-monotributo.xml`
+
+A handcrafted SOAP envelope mirroring the shape Padrón A13's `getPersona`
+returns for an active monotributista persona física. CUIT, names, address,
+DNI, and activity descriptions are all sanitized placeholders (`20111111112`,
+`JUAN PEREZ`, `CALLE FALSA 123`, …). Used by `tests/padron/parser.test.ts` to
+exercise the single-element-array normalization, optional fields, and the
+`categoriaMonotributo` branch.
+
+## `padron-persona-juridica-ri.xml`
+
+A handcrafted SOAP envelope for an active responsable inscripto persona
+jurídica with multiple actividades, multiple impuestos (including IVA), no
+`categoria` element, and a sanitized razón social (`ACME SA`, CUIT
+`30711111119`). Drives the multi-element parsing tests and the
+"Responsable Inscripto" label derivation in the formatter.
+
+## `padron-persona-cancelada.xml`
+
+A minimal handcrafted SOAP envelope for a persona física with
+`estadoClave=BAJA` and no domicilios, actividades, or impuestos. Verifies that
+the parser tolerates absent collection elements and that the formatter renders
+the BAJA state prominently.
+
+## `padron-cuit-not-found.xml`
+
+A handcrafted SOAP fault representing the response Padrón A13 emits when the
+queried CUIT does not exist in ARCA's records (`faultstring`: "No existe
+persona con ese Id"). Drives the `NOT_FOUND` mapping in
+`src/padron/client.ts`.
+
 ## Why these are committed to the repo
 
 Test fixtures need to be deterministic and available in CI. Generating the

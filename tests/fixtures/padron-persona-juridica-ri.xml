@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <ns2:getPersonaResponse xmlns:ns2="http://a13.soap.ws.server.puc.sr/">
+      <personaReturn>
+        <persona>
+          <idPersona>30711111119</idPersona>
+          <tipoPersona>JURIDICA</tipoPersona>
+          <tipoClave>CUIT</tipoClave>
+          <estadoClave>ACTIVO</estadoClave>
+          <razonSocial>ACME SA</razonSocial>
+          <fechaContratoSocial>2010-03-01</fechaContratoSocial>
+          <mesCierre>6</mesCierre>
+          <domicilio>
+            <direccion>AV CORRIENTES 1234</direccion>
+            <localidad>CABA</localidad>
+            <codPostal>1043</codPostal>
+            <descripcionProvincia>CIUDAD AUTONOMA DE BUENOS AIRES</descripcionProvincia>
+            <tipoDomicilio>FISCAL</tipoDomicilio>
+            <estado>ACTIVO</estado>
+          </domicilio>
+          <actividad>
+            <idActividad>620100</idActividad>
+            <descripcionActividad>SERVICIOS DE CONSULTORES EN INFORMATICA Y SUMINISTROS DE PROGRAMAS DE INFORMATICA</descripcionActividad>
+            <periodo>202001</periodo>
+            <orden>1</orden>
+            <nomenclador>883</nomenclador>
+          </actividad>
+          <actividad>
+            <idActividad>620900</idActividad>
+            <descripcionActividad>SERVICIOS DE INFORMATICA NCP</descripcionActividad>
+            <periodo>202001</periodo>
+            <orden>2</orden>
+            <nomenclador>883</nomenclador>
+          </actividad>
+          <actividad>
+            <idActividad>631110</idActividad>
+            <descripcionActividad>PROCESAMIENTO DE DATOS</descripcionActividad>
+            <periodo>202001</periodo>
+            <orden>3</orden>
+            <nomenclador>883</nomenclador>
+          </actividad>
+          <impuesto>
+            <idImpuesto>30</idImpuesto>
+            <descripcionImpuesto>IVA</descripcionImpuesto>
+            <periodo>202001</periodo>
+            <estado>ACTIVO</estado>
+          </impuesto>
+          <impuesto>
+            <idImpuesto>11</idImpuesto>
+            <descripcionImpuesto>GANANCIAS PERSONAS JURIDICAS</descripcionImpuesto>
+            <periodo>202001</periodo>
+            <estado>ACTIVO</estado>
+          </impuesto>
+          <impuesto>
+            <idImpuesto>301</idImpuesto>
+            <descripcionImpuesto>EMPLEADOR-APORTES SEG SOCIAL</descripcionImpuesto>
+            <periodo>202001</periodo>
+            <estado>ACTIVO</estado>
+          </impuesto>
+        </persona>
+      </personaReturn>
+    </ns2:getPersonaResponse>
+  </soap:Body>
+</soap:Envelope>
