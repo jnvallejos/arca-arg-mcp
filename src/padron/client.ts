@@ -83,7 +83,7 @@ function mapErrorToPadronError(err: SoapErrorLike): PadronError {
   const message = err.message ?? '';
   const haystack = `${body}\n${message}`;
 
-  if (/no existe persona/i.test(haystack)) {
+  if (/no existe persona|la clave \(cuit\/cuil\) consultada es inexistente/i.test(haystack)) {
     return new PadronError('NOT_FOUND', 'No persona registered with that CUIT in ARCA Padrón.');
   }
   if (isAuthFault(haystack)) {
