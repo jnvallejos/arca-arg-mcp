@@ -8,7 +8,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
-      include: ['src/**/*.ts'],
+      include: ['src/**/*.ts', 'scripts/**/*.ts'],
       // boot and wiring layers; tested via integration in later phases
       exclude: ['src/index.ts', 'src/server.ts'],
       thresholds: {
