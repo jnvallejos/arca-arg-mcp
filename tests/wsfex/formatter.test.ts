@@ -66,6 +66,38 @@ describe('formatResultadoEmisionExportacion (APROBADO)', () => {
     expect(out).toContain('15/04/2026');
   });
 
+  it('shows the foreign client name, ID impositivo, domicilio, and destino', () => {
+    const out = formatResultadoEmisionExportacion(makeAprobado());
+    expect(out).toContain('Cliente: TEST CLIENT INC');
+    expect(out).toContain('ID impositivo: TEST-EIN-12345');
+    expect(out).toContain('Domicilio: 123 Main St, NY, USA');
+    expect(out).toContain('Destino: ESTADOS UNIDOS');
+  });
+
+  it('omits the "ID impositivo:" line when the client has no idImpositivoExterior', () => {
+    const out = formatResultadoEmisionExportacion(
+      makeAprobado({
+        cliente: {
+          nombre: 'TEST CLIENT INC',
+          domicilio: '123 Main St, NY, USA',
+        },
+      }),
+    );
+    expect(out).not.toContain('ID impositivo:');
+    expect(out).toContain('Cliente: TEST CLIENT INC');
+    expect(out).toContain('Domicilio: 123 Main St, NY, USA');
+  });
+
+  it('renders the destino with its PAISES_WSFEX label when the code is known', () => {
+    const out = formatResultadoEmisionExportacion(makeAprobado({ destinoPais: 200 }));
+    expect(out).toContain('Destino: ESTADOS UNIDOS');
+  });
+
+  it('falls back to "País N" when the destino code is not in PAISES_WSFEX', () => {
+    const out = formatResultadoEmisionExportacion(makeAprobado({ destinoPais: 999 }));
+    expect(out).toContain('Destino: País 999');
+  });
+
   it('formats foreign-currency importe in en-US format with prefix', () => {
     const out = formatResultadoEmisionExportacion(
       makeAprobado({ importeTotal: 5000, moneda: 'DOL' }),
