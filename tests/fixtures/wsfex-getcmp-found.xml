@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <FEXGetCMPResponse xmlns="http://ar.gov.afip.dif.fexv1/">
+      <FEXGetCMPResult>
+        <FEXResultGet>
+          <Cuit>20239312345</Cuit>
+          <Cbte_Tipo>19</Cbte_Tipo>
+          <Punto_vta>1</Punto_vta>
+          <Cbte_nro>123</Cbte_nro>
+          <Fecha_cbte>20260415</Fecha_cbte>
+          <Imp_total>100.00</Imp_total>
+          <Tipo_expo>2</Tipo_expo>
+          <Permiso_existente>N</Permiso_existente>
+          <Dst_cmp>200</Dst_cmp>
+          <Cliente>TEST CLIENT INC</Cliente>
+          <Cuit_pais_cliente>0</Cuit_pais_cliente>
+          <Domicilio_cliente>123 Main St, NY, USA</Domicilio_cliente>
+          <Id_impositivo>TEST-EIN-12345</Id_impositivo>
+          <Moneda_Id>DOL</Moneda_Id>
+          <Moneda_ctz>1180.5</Moneda_ctz>
+          <Idioma_cbte>2</Idioma_cbte>
+          <Cae>75000000000000</Cae>
+          <Fch_venc_Cae>20260425</Fch_venc_Cae>
+          <Resultado>A</Resultado>
+          <Items>
+            <Item>
+              <Pro_codigo>TEST-001</Pro_codigo>
+              <Pro_ds>Consulting services</Pro_ds>
+              <Pro_qty>1</Pro_qty>
+              <Pro_umed>7</Pro_umed>
+              <Pro_precio_uni>100.00</Pro_precio_uni>
+              <Pro_total_item>100.00</Pro_total_item>
+            </Item>
+          </Items>
+        </FEXResultGet>
+      </FEXGetCMPResult>
+    </FEXGetCMPResponse>
+  </soap:Body>
+</soap:Envelope>

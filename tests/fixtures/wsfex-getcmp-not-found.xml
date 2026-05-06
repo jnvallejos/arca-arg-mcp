@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <FEXGetCMPResponse xmlns="http://ar.gov.afip.dif.fexv1/">
+      <FEXGetCMPResult>
+        <FEXErr>
+          <ErrCode>1502</ErrCode>
+          <ErrMsg>El comprobante no existe para los parámetros consultados.</ErrMsg>
+        </FEXErr>
+      </FEXGetCMPResult>
+    </FEXGetCMPResponse>
+  </soap:Body>
+</soap:Envelope>

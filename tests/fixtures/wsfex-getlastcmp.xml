@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <FEXGetLast_CMPResponse xmlns="http://ar.gov.afip.dif.fexv1/">
+      <FEXGetLast_CMPResult>
+        <FEXResult_LastCMP>
+          <Cbte_Tipo>19</Cbte_Tipo>
+          <Pto_venta>1</Pto_venta>
+          <Cbte_nro>122</Cbte_nro>
+          <Fecha_cbte>20260415</Fecha_cbte>
+        </FEXResult_LastCMP>
+      </FEXGetLast_CMPResult>
+    </FEXGetLast_CMPResponse>
+  </soap:Body>
+</soap:Envelope>
