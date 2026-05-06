@@ -275,7 +275,12 @@ chat UI.
   fetches the last authorized number and uses the next one. Supports concepto
   Productos, Servicios, or both. Argentine pesos only in V1 (foreign currency
   belongs to WSFEX in Phase 4). Notas de Crédito and Notas de Débito are not
-  exposed in V1.
+  exposed in V1. Requires `condicionIvaReceptor` (RG 5616) — the receiver's
+  IVA condition code: `1`=Responsable Inscripto, `4`=Sujeto Exento,
+  `5`=Consumidor Final, `6`=Monotributo, `7`=No Categorizado,
+  `8`=Proveedor del Exterior, `9`=Cliente del Exterior,
+  `10`=IVA Liberado Ley 19.640, `13`=Monotributista Social,
+  `15`=IVA No Alcanzado, `16`=Monotributo Trabajador Independiente Promovido.
 - **`arca_obtener_ultimo_comprobante`** — returns the last authorized
   comprobante number for a given punto de venta and tipo (1 / 6 / 11).
   Useful for figuring out the next number before emitting.
