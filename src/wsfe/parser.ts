@@ -7,11 +7,19 @@ import type {
   Concepto,
   CondicionIvaReceptor,
   ObservacionWsfe,
-  ResultadoEmision,
   TipoComprobante,
   TipoDocReceptor,
   UltimoComprobante,
 } from './types.js';
+
+/**
+ * `FECAESolicitarResponse` does not include `ImpTotal` in `FECAEDetResponse`,
+ * so the parser cannot produce a fully-formed `ComprobanteAutorizado`. The
+ * client is responsible for stamping `importeTotal` from the original request
+ * after parsing.
+ */
+type ParsedAprobado = Omit<ComprobanteAutorizado, 'importeTotal'>;
+export type ParsedResultado = ParsedAprobado | ComprobanteRechazado;
 
 const ARRAY_TAGS = new Set(['FECAEDetResponse', 'Obs', 'Err']);
 
@@ -38,7 +46,6 @@ interface RawDet {
   Resultado?: string;
   CAE?: string;
   CAEFchVto?: string;
-  ImpTotal?: string;
   Observaciones?: { Obs?: RawObs[] };
 }
 
@@ -57,12 +64,16 @@ interface RawFeCaeResult {
 
 /**
  * Parses a `FECAESolicitarResponse` XML document into a discriminated
- * `ResultadoEmision`. Business rejections (`Resultado='R'` or `'P'`) DO NOT
+ * `ParsedResultado`. Business rejections (`Resultado='R'` or `'P'`) DO NOT
  * throw; they return a `ComprobanteRechazado` so the caller can surface the
  * outcome to the user. Throws {@link WsfeError} only for unparseable XML or
  * structurally malformed responses.
+ *
+ * The parsed `aprobado` variant intentionally omits `importeTotal` because
+ * `FECAESolicitarResponse` does not include it. The caller stamps that field
+ * from the original request.
  */
-export function parseFeCaeResponse(xml: string): ResultadoEmision {
+export function parseFeCaeResponse(xml: string): ParsedResultado {
   const root = parseRoot(xml);
   const result = findResult<RawFeCaeResult>(root, 'FECAESolicitarResult');
   if (!result) {
@@ -83,7 +94,7 @@ export function parseFeCaeResponse(xml: string): ResultadoEmision {
 
   const detResultado = det.Resultado ?? cab.Resultado;
   if (detResultado === 'A') {
-    const aprobado: ComprobanteAutorizado = {
+    const aprobado: ParsedAprobado = {
       status: 'aprobado',
       cae: det.CAE ?? '',
       fechaVencimientoCae: fromWsfeDate(det.CAEFchVto ?? ''),
@@ -91,7 +102,6 @@ export function parseFeCaeResponse(xml: string): ResultadoEmision {
       tipoComprobante,
       puntoVenta,
       fechaComprobante: fromWsfeDate(det.CbteFch ?? ''),
-      importeTotal: parseFloatOr(det.ImpTotal, 0),
       observaciones,
     };
     return aprobado;
