@@ -4,10 +4,17 @@
     <FEXGetPARAM_CtzResponse xmlns="http://ar.gov.afip.dif.fexv1/">
       <FEXGetPARAM_CtzResult>
         <FEXResultGet>
-          <Mon_id>DOL</Mon_id>
           <Mon_ctz>1180.5</Mon_ctz>
-          <Fecha_ctz>20260415</Fecha_ctz>
+          <Mon_fecha>20260415</Mon_fecha>
         </FEXResultGet>
+        <FEXErr>
+          <ErrCode>0</ErrCode>
+          <ErrMsg>OK</ErrMsg>
+        </FEXErr>
+        <FEXEvents>
+          <EventCode>0</EventCode>
+          <EventMsg>Ok</EventMsg>
+        </FEXEvents>
       </FEXGetPARAM_CtzResult>
     </FEXGetPARAM_CtzResponse>
   </soap:Body>
