@@ -74,6 +74,51 @@ queried CUIT does not exist in ARCA's records (`faultstring`: "No existe
 persona con ese Id"). Drives the `NOT_FOUND` mapping in
 `src/padron/client.ts`.
 
+## `wsfe-fecae-success.xml`
+
+Single-comprobante `FECAESolicitarResponse` envelope with `Resultado='A'` and
+a sanitized CAE (`75000000000000`). Drives the parser's "approved" branch and
+the formatter's `✅` rendering. The CUIT, importes, and CAE are all
+placeholder values; nothing in this file corresponds to a real invoice.
+
+## `wsfe-fecae-success-with-observations.xml`
+
+Same shape as the success fixture, but the response includes a non-empty
+`Observaciones` array with two entries. Verifies that warnings are preserved
+on success and that the formatter surfaces them in a dedicated section.
+
+## `wsfe-fecae-rejected.xml`
+
+`FECAESolicitarResponse` with `Resultado='R'` at both the cabecera and
+detalle levels, no CAE, and an `Observaciones` list explaining why ARCA
+rejected the comprobante (code `10017`). Drives the discriminated-union
+"rechazado" branch — note that this is a business rejection and must NOT
+throw.
+
+## `wsfe-fecae-error-validacion.xml`
+
+`FECAESolicitarResponse` with `Resultado='R'` plus a top-level `Errors`
+collection containing a schema-level error (`Code 1006`). Exercises the
+parser's "errores" pathway separately from observaciones.
+
+## `wsfe-fecomp-consultar-found.xml`
+
+`FECompConsultarResponse` containing a `ResultGet` block with the full
+detalle of a previously authorized Factura B (sanitized CAE
+`75000000000000`). Drives `parseFeCompConsultarResponse`.
+
+## `wsfe-fecomp-consultar-not-found.xml`
+
+`FECompConsultarResponse` with no `ResultGet` and an `Errors` collection
+containing the canonical "no existe" message. Drives the
+`WsfeError('NOT_FOUND', ...)` mapping in the parser.
+
+## `wsfe-fecomp-ultimo-autorizado.xml`
+
+`FECompUltimoAutorizadoResponse` returning `PtoVta`, `CbteTipo`, and
+`CbteNro=12344`. Drives the parser branch that resolves "next available
+number".
+
 ## Why these are committed to the repo
 
 Test fixtures need to be deterministic and available in CI. Generating the
