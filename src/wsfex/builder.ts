@@ -10,11 +10,14 @@ import type {
  * Builds the WSFEX `FEXAuthorize` request payload from a validated tool input
  * plus an explicit comprobante number (resolved by the tool layer).
  *
- * Pure function. Forces project invariants: `Permiso_existente='N'`,
- * `Cuit_pais_cliente=0`, empty `Permisos`/`Cmps_asoc`/`Opcionales` arrays
- * (PERMISO_EMBARQUE / CmpAsoc / Opcionales are deferred to V2). Numeric
- * importes are rounded defensively to 2 decimals; `Pro_qty` keeps up to 6
- * decimals so fractional-hour services round-trip cleanly.
+ * Pure function. Forces project invariants: `Cuit_pais_cliente=0`, empty
+ * `Permisos`/`Cmps_asoc`/`Opcionales` arrays (PERMISO_EMBARQUE / CmpAsoc /
+ * Opcionales are deferred to V2). `Permiso_existente` is `'N'` only when the
+ * comprobante is for goods (`concepto=1`, `Tipo_expo=1`); for services
+ * (`concepto=2`) or others (`concepto=4`) it is sent empty per ARCA's
+ * validation rules. Numeric importes are rounded defensively to 2 decimals;
+ * `Pro_qty` keeps up to 6 decimals so fractional-hour services round-trip
+ * cleanly.
  *
  * The `authenticatedCuit` parameter is kept in the signature so the SOAP
  * client can pass it as part of the `Auth` envelope; it is not stamped into
@@ -32,7 +35,7 @@ export function buildFexAuthorizeRequest(
     Punto_vta: input.puntoVenta,
     Cbte_nro: numeroComprobante,
     Tipo_expo: input.concepto,
-    Permiso_existente: 'N',
+    Permiso_existente: input.concepto === 1 ? 'N' : '',
     Dst_cmp: input.destinoPais,
     Cliente: input.cliente.nombre,
     Cuit_pais_cliente: 0,
