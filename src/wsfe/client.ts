@@ -3,6 +3,7 @@ import type { ArcaConfig, ArcaEnv } from '../config/types.js';
 import { WsfeError } from '../lib/errors.js';
 import { getValidToken } from '../wsaa/auth.js';
 import {
+  type ParsedResultado,
   parseFeCaeResponse,
   parseFeCompConsultarResponse,
   parseFeCompUltimoAutorizadoResponse,
@@ -58,7 +59,18 @@ export async function feCaeSolicitar(
   );
 
   const xml = extractRawResponse(raw);
-  return safeParse(() => parseFeCaeResponse(xml), 'parse FECAESolicitar response');
+  const parsed = safeParse(() => parseFeCaeResponse(xml), 'parse FECAESolicitar response');
+  return withImporte(parsed, request);
+}
+
+function withImporte(parsed: ParsedResultado, request: FeCaeRequest): ResultadoEmision {
+  if (parsed.status === 'aprobado') {
+    return {
+      ...parsed,
+      importeTotal: request.FeDetReq.FECAEDetRequest[0].ImpTotal,
+    };
+  }
+  return parsed;
 }
 
 /**
