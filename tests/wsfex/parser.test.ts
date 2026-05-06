@@ -164,7 +164,10 @@ describe('parseFexGetParamCtzResponse', () => {
   });
 
   it('parses Fecha_ctz in compact yyyymmdd format', () => {
-    const xml = getCtz.replace('<Fecha_ctz>20260415</Fecha_ctz>', '<Fecha_ctz>20260415</Fecha_ctz>');
+    const xml = getCtz.replace(
+      '<Fecha_ctz>20260415</Fecha_ctz>',
+      '<Fecha_ctz>20260415</Fecha_ctz>',
+    );
     const r = parseFexGetParamCtzResponse(xml);
     expect(r.fechaCotizacion).toBe('2026-04-15');
   });
