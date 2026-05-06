@@ -72,6 +72,12 @@ function aprobado(
     importeTotal: 100,
     moneda: 'DOL',
     cotizacion: 1180.5,
+    cliente: {
+      nombre: 'TEST CLIENT INC',
+      domicilio: '123 Main St, NY, USA',
+      idImpositivoExterior: 'TEST-EIN-12345',
+    },
+    destinoPais: 200,
     ...overrides,
   };
 }

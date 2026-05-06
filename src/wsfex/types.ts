@@ -115,6 +115,10 @@ export interface ComprobanteExportacionAutorizado {
   importeTotal: number;
   moneda: CodigoMoneda;
   cotizacion: number;
+  /** Foreign client info stamped from the original request (response does not echo it). */
+  cliente: ClienteExportacion;
+  /** Destination country code stamped from the original request (response does not echo it). */
+  destinoPais: CodigoPais;
 }
 
 /** Rejection from ARCA business validation (Resultado='R'). */

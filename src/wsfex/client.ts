@@ -46,10 +46,10 @@ interface WsfexSoapClient {
  * `ComprobanteExportacionRechazado` discriminated-union variant. Throwing is
  * reserved for genuine errors (network, auth, malformed response).
  *
- * Same `importeTotal` / `moneda` / `cotizacion` stamping pattern as WSFE's
- * Phase 3 fix-up: the FEXAuthorize response does not echo these fields, so
- * the client reads them from the original request and stamps them onto the
- * aprobado result.
+ * Same stamping pattern as WSFE's Phase 3 fix-up: the FEXAuthorize response
+ * does not echo `importeTotal`, `moneda`, `cotizacion`, `cliente`, or
+ * `destinoPais`, so the client reads them from the original request and
+ * stamps them onto the aprobado result.
  */
 export async function fexAuthorize(
   request: FexAuthorizeRequest,
@@ -69,10 +69,10 @@ export async function fexAuthorize(
 
   const xml = extractRawResponse(raw);
   const parsed = safeParse(() => parseFexAuthorizeResponse(xml), 'parse FEXAuthorize response');
-  return withImporte(parsed, request);
+  return withRequestData(parsed, request);
 }
 
-function withImporte(
+function withRequestData(
   parsed: ParsedResultadoExportacion,
   request: FexAuthorizeRequest,
 ): ResultadoEmisionExportacion {
@@ -82,6 +82,12 @@ function withImporte(
       importeTotal: request.Cmp.Imp_total,
       moneda: request.Cmp.Moneda_Id as CodigoMoneda,
       cotizacion: request.Cmp.Moneda_ctz,
+      cliente: {
+        nombre: request.Cmp.Cliente,
+        domicilio: request.Cmp.Domicilio_cliente,
+        idImpositivoExterior: request.Cmp.Id_impositivo,
+      },
+      destinoPais: request.Cmp.Dst_cmp,
     };
   }
   return parsed;
