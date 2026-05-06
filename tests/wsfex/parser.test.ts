@@ -156,49 +156,36 @@ describe('parseFexGetCmpResponse', () => {
 });
 
 describe('parseFexGetParamCtzResponse', () => {
-  it('parses moneda, cotización, and fecha', () => {
-    const r = parseFexGetParamCtzResponse(getCtz);
+  it('parses cotización and fecha, stamping moneda from the parameter', () => {
+    const r = parseFexGetParamCtzResponse(getCtz, 'DOL');
     expect(r.moneda).toBe('DOL');
     expect(r.cotizacion).toBe(1180.5);
     expect(r.fechaCotizacion).toBe('2026-04-15');
   });
 
-  it('parses Fecha_ctz in compact yyyymmdd format', () => {
-    const xml = getCtz.replace(
-      '<Fecha_ctz>20260415</Fecha_ctz>',
-      '<Fecha_ctz>20260415</Fecha_ctz>',
-    );
-    const r = parseFexGetParamCtzResponse(xml);
-    expect(r.fechaCotizacion).toBe('2026-04-15');
-  });
-
-  it('parses Fecha_ctz in ISO yyyy-mm-dd format', () => {
-    const xml = getCtz.replace(
-      '<Fecha_ctz>20260415</Fecha_ctz>',
-      '<Fecha_ctz>2026-04-15</Fecha_ctz>',
-    );
-    const r = parseFexGetParamCtzResponse(xml);
+  it('parses Mon_fecha in compact yyyymmdd format', () => {
+    const r = parseFexGetParamCtzResponse(getCtz, 'DOL');
     expect(r.fechaCotizacion).toBe('2026-04-15');
   });
 
   it('returns empty string for unknown date format', () => {
     const xml = getCtz.replace(
-      '<Fecha_ctz>20260415</Fecha_ctz>',
-      '<Fecha_ctz>15/04/2026</Fecha_ctz>',
+      '<Mon_fecha>20260415</Mon_fecha>',
+      '<Mon_fecha>15/04/2026</Mon_fecha>',
     );
-    const r = parseFexGetParamCtzResponse(xml);
+    const r = parseFexGetParamCtzResponse(xml, 'DOL');
     expect(r.fechaCotizacion).toBe('');
   });
 
   it('throws WsfexError when the response is malformed', () => {
-    expect(() => parseFexGetParamCtzResponse('<bad')).toThrow(WsfexError);
+    expect(() => parseFexGetParamCtzResponse('<bad', 'DOL')).toThrow(WsfexError);
   });
 
   it('throws WsfexError when the response lacks the expected result block', () => {
     const xml =
       '<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
       '<soap:Body></soap:Body></soap:Envelope>';
-    expect(() => parseFexGetParamCtzResponse(xml)).toThrow(WsfexError);
+    expect(() => parseFexGetParamCtzResponse(xml, 'DOL')).toThrow(WsfexError);
   });
 });
 
