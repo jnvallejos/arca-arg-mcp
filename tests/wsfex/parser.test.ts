@@ -183,7 +183,10 @@ describe('parser fallback branches', () => {
   });
 
   it('GetCmp with non-numeric Cbte_nro falls back to 0', () => {
-    const xml = getCmpFound.replace('<Cbte_nro>123</Cbte_nro>', '<Cbte_nro>not-a-number</Cbte_nro>');
+    const xml = getCmpFound.replace(
+      '<Cbte_nro>123</Cbte_nro>',
+      '<Cbte_nro>not-a-number</Cbte_nro>',
+    );
     const r = parseFexGetCmpResponse(xml);
     expect(r.numeroComprobante).toBe(0);
   });
