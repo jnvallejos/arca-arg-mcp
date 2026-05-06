@@ -119,6 +119,52 @@ containing the canonical "no existe" message. Drives the
 `CbteNro=12344`. Drives the parser branch that resolves "next available
 number".
 
+## `wsfex-authorize-success.xml`
+
+Single-comprobante `FEXAuthorizeResponse` envelope for a Factura E with
+`Resultado='A'` and a sanitized CAE (`75000000000000`). Drives the parser's
+"approved" branch and the formatter's `✅` rendering. Importes are USD
+amounts, the receiver is `TEST CLIENT INC` to a US destination — all
+fictional placeholder values.
+
+## `wsfex-authorize-rejected.xml`
+
+`FEXAuthorizeResponse` with `Resultado='R'`, no CAE, a `Motivos_Obs`
+narrative, and a `FEXErr` with code `500` (wrong number). Drives the
+discriminated-union "rechazado" branch — note that this is a business
+rejection and must NOT throw.
+
+## `wsfex-authorize-error-validacion.xml`
+
+`FEXAuthorizeResponse` with `Resultado='R'` and multiple `FEXErr` entries
+covering codes `607` (cotización mismatch) and `650` (idioma inválido).
+Exercises the parser's multi-error pathway.
+
+## `wsfex-getcmp-found.xml`
+
+`FEXGetCMPResponse` containing a `FEXResultGet` block with the full detalle
+of a previously authorized Factura E (sanitized CAE `75000000000000`,
+fictional client `TEST CLIENT INC`, USD amounts). Drives
+`parseFexGetCmpResponse`.
+
+## `wsfex-getcmp-not-found.xml`
+
+`FEXGetCMPResponse` with no `FEXResultGet` and a `FEXErr` collection
+containing the canonical "no existe" message. Drives the
+`WsfexError('NOT_FOUND', ...)` mapping in the parser.
+
+## `wsfex-getlastcmp.xml`
+
+`FEXGetLast_CMPResponse` returning `Pto_venta`, `Cbte_Tipo`, and
+`Cbte_nro=122`. Drives the parser branch that resolves the next available
+Factura E number.
+
+## `wsfex-getparam-ctz.xml`
+
+`FEXGetPARAM_CtzResponse` returning a sample cotización (`Mon_id=DOL`,
+`Mon_ctz=1180.5`, `Fecha_ctz=20260415`). Drives `parseFexGetParamCtzResponse`
+and the `arca_obtener_cotizacion_moneda` tool tests.
+
 ## Why these are committed to the repo
 
 Test fixtures need to be deterministic and available in CI. Generating the

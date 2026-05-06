@@ -19,7 +19,7 @@ MCP (Model Context Protocol) server for Argentine tax compliance. Exposes ARCA (
 - [x] Phase 1 — WSAA authentication
 - [x] Phase 2 — Padrón (CUIT lookup)
 - [x] Phase 3 — WSFE (Factura A, B, C)
-- [ ] Phase 4 — WSFEX (Factura E)
+- [x] Phase 4 — WSFEX (Factura E)
 - [ ] Phase 5 — Release v1.0.0
 
 ## Why this exists
@@ -195,8 +195,16 @@ There are two smoke scripts, runnable individually or as a chained pair:
   authorized for `wsfe`. Optionally set `SMOKE_PV` to override the default
   punto de venta `1`. Homologation invoices have no fiscal validity, do not
   appear in the productive padrón, and do not affect declarations.
-- `npm run smoke` — runs `smoke:wsaa`, then `smoke:padron`, then `smoke:wsfe`
-  in sequence (fail-fast). Useful for a single end-to-end check after setup.
+- `npm run smoke:wsfex` — emits a real **Factura E** (export invoice) in the
+  homologation environment against a fictional foreign client
+  (`TEST CLIENT INC`, ESTADOS UNIDOS, USD 100, `idImpositivoExterior=TEST-EIN-12345`)
+  using the cotización ARCA publishes for the day. Prints the returned CAE
+  length only (the CAE itself is never displayed). The certificate must be
+  authorized for `wsfex`. Optionally set `SMOKE_PV` to override the default
+  punto de venta `1`. Same homologation guarantees as `smoke:wsfe`.
+- `npm run smoke` — runs `smoke:wsaa`, then `smoke:padron`, then `smoke:wsfe`,
+  then `smoke:wsfex` in sequence (fail-fast). Useful for a single end-to-end
+  check after setup.
 
 ```bash
 ARCA_ENV=homologation \
@@ -228,9 +236,9 @@ addresses, or activity descriptions.
 - `WsaaError: coe.invalidSignature: ...` — the cert and key don't match, or you
   submitted a CSR generated from a different key. Regenerate the key + CSR + cert.
 - `WsaaError: <unauthorized service>` — the cert is valid but not authorized for
-  `wsfe` (or `ws_sr_padron_a13` for `smoke:padron`, or `wsfe` for `smoke:wsfe`).
-  Repeat step 6 of **Obtaining ARCA test credentials**, picking the service you
-  need.
+  the service you're calling (`ws_sr_padron_a13` for `smoke:padron`, `wsfe`
+  for `smoke:wsfe`, `wsfex` for `smoke:wsfex`). Repeat step 6 of **Obtaining
+  ARCA test credentials**, picking the service you need.
 - `PadronError: NOT_FOUND: ...` — the CUIT doesn't exist in ARCA's records.
   Double-check `SMOKE_CUIT` (or your own `ARCA_CUIT`).
 
@@ -291,6 +299,25 @@ chat UI.
 - **`arca_listar_tipos_comprobante`** — lists the comprobante types this
   server supports (Factura A, B, C). Helps the LLM pick the right `tipoComprobante`
   before calling `arca_emitir_factura`.
+- **`arca_emitir_factura_exportacion`** — emits a Factura E (export invoice,
+  tipo 19) via WSFEX and returns the CAE. Designed for Argentine freelancers
+  and companies billing foreign clients in foreign currency. Supports ~12
+  currencies (USD, EUR, GBP, BRL, CLP, UYU, JPY, CNY, KRW, CHF, MXN, CAD)
+  and the 12 most common destinations. The cotización must be passed
+  explicitly — call `arca_obtener_cotizacion_moneda` first to get the value
+  ARCA will accept. If `numeroComprobante` is omitted, the server fetches the
+  last authorized number and uses the next one. PERMISO_EMBARQUE,
+  comprobantes asociados, and opcionales are deferred to V2.
+- **`arca_obtener_ultimo_comprobante_exportacion`** — returns the last
+  authorized Factura E number for a given punto de venta. Useful for
+  figuring out the next number before emitting.
+- **`arca_consultar_factura_exportacion`** — retrieves the full detail of a
+  previously authorized Factura E (cliente, importes, moneda, cotización,
+  CAE, vencimiento) by punto de venta and número. Surfaces a friendly "no
+  se encontró" message when ARCA has no record.
+- **`arca_obtener_cotizacion_moneda`** — returns the cotización (ARS per unit
+  of foreign currency) ARCA publishes for the day. Call this before
+  `arca_emitir_factura_exportacion` to pass the exact value ARCA expects.
 
 ## Development
 
@@ -302,10 +329,11 @@ npm test               # run the full Vitest suite
 npm run lint           # Biome lint (zero-warning policy)
 npm run typecheck      # strict TypeScript check
 npm run build          # compile to dist/
-npm run smoke          # end-to-end WSAA + Padrón + WSFE verification (real credentials required)
+npm run smoke          # end-to-end WSAA + Padrón + WSFE + WSFEX verification (real credentials required)
 npm run smoke:wsaa     # WSAA smoke only
 npm run smoke:padron   # Padrón smoke only (set SMOKE_CUIT to look up a specific CUIT)
 npm run smoke:wsfe     # WSFE smoke only — emits a real Factura B in homologation (set SMOKE_PV to override punto de venta)
+npm run smoke:wsfex    # WSFEX smoke only — emits a real Factura E (USD 100) against a fictional foreign client in homologation
 ```
 
 `npm run smoke*` scripts are **not** wired into CI — they require a real
@@ -316,14 +344,15 @@ ARCA-issued certificate. CI runs unit and integration tests only.
 ```
 arca-arg-mcp/
 ├── docs/             phase-by-phase implementation specs
-├── scripts/          developer-only scripts (smoke-wsaa.ts, smoke-padron.ts, smoke-wsfe.ts)
+├── scripts/          developer-only scripts (smoke-wsaa.ts, smoke-padron.ts, smoke-wsfe.ts, smoke-wsfex.ts)
 ├── src/
 │   ├── config/       env loading and ARCA endpoint table
 │   ├── lib/          shared utilities (logging, paths, errors)
 │   ├── padron/       Padrón A13 SOAP client, parser, formatter
-│   ├── tools/        MCP tool handlers (ping, arca_status, arca_consultar_cuit, arca_emitir_factura, ...)
+│   ├── tools/        MCP tool handlers (ping, arca_status, arca_consultar_cuit, arca_emitir_factura, arca_emitir_factura_exportacion, ...)
 │   ├── wsaa/         WSAA auth: TRA build, CMS signing, SOAP client, TA cache
-│   └── wsfe/         WSFE Factura A/B/C: codes, builder, parser, formatter, SOAP client
+│   ├── wsfe/         WSFE Factura A/B/C: codes, builder, parser, formatter, SOAP client
+│   └── wsfex/        WSFEX Factura E (export): codes, builder, parser, formatter, SOAP client
 └── tests/            Vitest unit and integration tests, mirroring src/
 ```
 
