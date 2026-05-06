@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { formatWsfeSmokeSummary } from '../../scripts/smoke-wsfe.js';
-import type {
-  ComprobanteAutorizado,
-  ComprobanteRechazado,
-} from '../../src/wsfe/types.js';
+import type { ComprobanteAutorizado, ComprobanteRechazado } from '../../src/wsfe/types.js';
 
 const SECRET_CAE = '75123456789012';
 

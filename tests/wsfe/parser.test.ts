@@ -21,10 +21,7 @@ const consultarNotFound = readFileSync(
   join(FIXTURES, 'wsfe-fecomp-consultar-not-found.xml'),
   'utf-8',
 );
-const ultimoAutorizado = readFileSync(
-  join(FIXTURES, 'wsfe-fecomp-ultimo-autorizado.xml'),
-  'utf-8',
-);
+const ultimoAutorizado = readFileSync(join(FIXTURES, 'wsfe-fecomp-ultimo-autorizado.xml'), 'utf-8');
 
 describe('parseFeCaeResponse', () => {
   it('parses Resultado=A into ComprobanteAutorizado with all key fields', () => {
@@ -74,10 +71,7 @@ describe('parseFeCaeResponse', () => {
   });
 
   it("treats Resultado='P' (parcial) as a Rechazado in V1", () => {
-    const partial = success.replaceAll(
-      '<Resultado>A</Resultado>',
-      '<Resultado>P</Resultado>',
-    );
+    const partial = success.replaceAll('<Resultado>A</Resultado>', '<Resultado>P</Resultado>');
     const r = parseFeCaeResponse(partial);
     expect(r.status).toBe('rechazado');
   });

@@ -122,10 +122,7 @@ export function parseFeCompUltimoAutorizadoResponse(xml: string): UltimoComproba
   const root = parseRoot(xml);
   const result = findResult<RawUltimoResult>(root, 'FECompUltimoAutorizadoResult');
   if (!result) {
-    throw new WsfeError(
-      'UNKNOWN',
-      'WSFE response did not contain FECompUltimoAutorizadoResult.',
-    );
+    throw new WsfeError('UNKNOWN', 'WSFE response did not contain FECompUltimoAutorizadoResult.');
   }
   return {
     puntoVenta: parseIntOr(result.PtoVta, 0),

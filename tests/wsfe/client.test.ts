@@ -10,10 +10,7 @@ const FIXTURES = join(process.cwd(), 'tests/fixtures');
 const successXml = readFileSync(join(FIXTURES, 'wsfe-fecae-success.xml'), 'utf-8');
 const rejectedXml = readFileSync(join(FIXTURES, 'wsfe-fecae-rejected.xml'), 'utf-8');
 const ultimoXml = readFileSync(join(FIXTURES, 'wsfe-fecomp-ultimo-autorizado.xml'), 'utf-8');
-const consultarFoundXml = readFileSync(
-  join(FIXTURES, 'wsfe-fecomp-consultar-found.xml'),
-  'utf-8',
-);
+const consultarFoundXml = readFileSync(join(FIXTURES, 'wsfe-fecomp-consultar-found.xml'), 'utf-8');
 const consultarNotFoundXml = readFileSync(
   join(FIXTURES, 'wsfe-fecomp-consultar-not-found.xml'),
   'utf-8',

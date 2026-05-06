@@ -61,7 +61,8 @@ const inputSchema = z
     if ((input.concepto === 2 || input.concepto === 3) && !input.servicio) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Concepto 2 or 3 requires service dates (fechaDesde, fechaHasta, fechaVencimientoPago).',
+        message:
+          'Concepto 2 or 3 requires service dates (fechaDesde, fechaHasta, fechaVencimientoPago).',
       });
     }
     if (input.concepto === 1 && input.servicio) {

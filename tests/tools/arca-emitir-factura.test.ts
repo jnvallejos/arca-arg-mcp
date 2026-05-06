@@ -218,9 +218,7 @@ describe('arca_emitir_factura tool', () => {
 
   it('accepts Factura C (no iva) and emits successfully', async () => {
     feCompUltimoAutorizadoMock.mockResolvedValue({ puntoVenta: 1, tipoComprobante: 11, numero: 0 });
-    feCaeSolicitarMock.mockResolvedValue(
-      aprobado({ tipoComprobante: 11, numeroComprobante: 1 }),
-    );
+    feCaeSolicitarMock.mockResolvedValue(aprobado({ tipoComprobante: 11, numeroComprobante: 1 }));
     const { handleArcaEmitirFactura } = await import('../../src/tools/arca-emitir-factura.js');
     const out = await handleArcaEmitirFactura(makeConfig(), {
       ...baseFacturaB(),

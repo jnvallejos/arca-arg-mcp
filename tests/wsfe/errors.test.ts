@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { describeWsfeError, WSFE_ERROR_HINTS } from '../../src/wsfe/errors.js';
+import { WSFE_ERROR_HINTS, describeWsfeError } from '../../src/wsfe/errors.js';
 
 describe('describeWsfeError', () => {
   it('appends a hint when the error code is known', () => {

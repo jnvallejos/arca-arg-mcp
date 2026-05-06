@@ -19,9 +19,7 @@ function makeConfig(): ArcaConfig {
   };
 }
 
-function makeConsultado(
-  overrides: Partial<ComprobanteConsultado> = {},
-): ComprobanteConsultado {
+function makeConsultado(overrides: Partial<ComprobanteConsultado> = {}): ComprobanteConsultado {
   return {
     numeroComprobante: 12345,
     tipoComprobante: 6,

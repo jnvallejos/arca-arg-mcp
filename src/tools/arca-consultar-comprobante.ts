@@ -2,8 +2,8 @@ import type { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 import type { ArcaConfig } from '../config/types.js';
 import { WsfeError } from '../lib/errors.js';
-import { TIPOS_COMPROBANTE_V1 } from '../wsfe/codes.js';
 import { feCompConsultar } from '../wsfe/client.js';
+import { TIPOS_COMPROBANTE_V1 } from '../wsfe/codes.js';
 import { formatComprobanteConsultado } from '../wsfe/formatter.js';
 import type { TipoComprobante } from '../wsfe/types.js';
 
@@ -41,7 +41,12 @@ export async function handleArcaConsultarComprobante(
   const { puntoVenta, tipoComprobante, numeroComprobante } = inputSchema.parse(args);
 
   try {
-    const comprobante = await feCompConsultar(puntoVenta, tipoComprobante, numeroComprobante, config);
+    const comprobante = await feCompConsultar(
+      puntoVenta,
+      tipoComprobante,
+      numeroComprobante,
+      config,
+    );
     return {
       content: [{ type: 'text', text: formatComprobanteConsultado(comprobante) }],
     };
@@ -60,11 +65,7 @@ export async function handleArcaConsultarComprobante(
   }
 }
 
-function notFoundMessage(
-  tipo: TipoComprobante,
-  puntoVenta: number,
-  numero: number,
-): string {
+function notFoundMessage(tipo: TipoComprobante, puntoVenta: number, numero: number): string {
   const label = TIPOS_COMPROBANTE_V1[tipo].name;
   const pv = String(puntoVenta).padStart(4, '0');
   const num = String(numero).padStart(8, '0');

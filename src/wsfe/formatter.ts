@@ -123,9 +123,7 @@ export function formatTiposComprobanteList(): string {
   lines.push('|--------|-------------|----------------------------|');
   for (const code of [1, 6, 11] as TipoComprobante[]) {
     const t = TIPOS_COMPROBANTE_V1[code];
-    lines.push(
-      `| ${String(code).padEnd(6)} | ${t.name.padEnd(11)} | ${t.issuer.padEnd(26)} |`,
-    );
+    lines.push(`| ${String(code).padEnd(6)} | ${t.name.padEnd(11)} | ${t.issuer.padEnd(26)} |`);
   }
   lines.push('');
   lines.push('Notas de Crédito y Notas de Débito no están disponibles en V1.');
