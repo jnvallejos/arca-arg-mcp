@@ -67,6 +67,7 @@ function makeRequest(): FexAuthorizeRequest {
       Cliente: 'TEST CLIENT INC',
       Cuit_pais_cliente: 0,
       Domicilio_cliente: '123 Main St, NY, USA',
+      Id_impositivo: 'TEST-EIN-12345',
       Moneda_Id: 'DOL',
       Moneda_ctz: 1180.5,
       Imp_total: 100,
@@ -171,6 +172,37 @@ describe('fexAuthorize', () => {
     expect(r.importeTotal).toBe(12345.67);
     expect(r.moneda).toBe('060');
     expect(r.cotizacion).toBe(1300.5);
+  });
+
+  it('stamps cliente and destinoPais from the request onto a successful result', async () => {
+    // FEXAuthorizeResponse does not echo Cliente, Domicilio_cliente,
+    // Id_impositivo, or Dst_cmp either. The client stamps them so the LLM
+    // can confirm who was billed and to which country.
+    fexAuthorizeMock.mockResolvedValue([{}, successXml]);
+    const { fexAuthorize } = await import('../../src/wsfex/client.js');
+    const req = makeRequest();
+    req.Cmp.Cliente = 'TEST CLIENT INC';
+    req.Cmp.Domicilio_cliente = '123 Main St, NY, USA';
+    req.Cmp.Id_impositivo = 'TEST-EIN-12345';
+    req.Cmp.Dst_cmp = 200;
+    const r = await fexAuthorize(req, makeConfig());
+    expect(r.status).toBe('aprobado');
+    if (r.status !== 'aprobado') return;
+    expect(r.cliente.nombre).toBe('TEST CLIENT INC');
+    expect(r.cliente.domicilio).toBe('123 Main St, NY, USA');
+    expect(r.cliente.idImpositivoExterior).toBe('TEST-EIN-12345');
+    expect(r.destinoPais).toBe(200);
+  });
+
+  it('leaves cliente.idImpositivoExterior undefined when the request has no Id_impositivo', async () => {
+    fexAuthorizeMock.mockResolvedValue([{}, successXml]);
+    const { fexAuthorize } = await import('../../src/wsfex/client.js');
+    const req = makeRequest();
+    req.Cmp.Id_impositivo = undefined;
+    const r = await fexAuthorize(req, makeConfig());
+    expect(r.status).toBe('aprobado');
+    if (r.status !== 'aprobado') return;
+    expect(r.cliente.idImpositivoExterior).toBeUndefined();
   });
 
   it('parses RECHAZADO responses without throwing', async () => {
