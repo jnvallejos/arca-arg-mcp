@@ -37,6 +37,14 @@ describe('parseFeCaeResponse', () => {
     expect(r.observaciones).toEqual([]);
   });
 
+  it('does not assign importeTotal on a successful emission', () => {
+    // FECAESolicitarResponse does not contain ImpTotal — that field is part of
+    // the request, not the response. The parser must not invent it.
+    const r = parseFeCaeResponse(success);
+    expect(r.status).toBe('aprobado');
+    expect('importeTotal' in r).toBe(false);
+  });
+
   it('preserves observaciones on a successful response', () => {
     const r = parseFeCaeResponse(successObs);
     expect(r.status).toBe('aprobado');
