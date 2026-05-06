@@ -81,8 +81,27 @@ interface RawAuthResult {
 export function parseFexAuthorizeResponse(xml: string): ParsedResultadoExportacion {
   const root = parseRoot(xml);
   const result = findResult<RawAuthResult>(root, 'FEXAuthorizeResult');
-  if (!result || !result.FEXResultAuth) {
-    throw new WsfexError('UNKNOWN', 'WSFEX response did not contain FEXResultAuth.');
+  if (!result) {
+    throw new WsfexError('UNKNOWN', 'WSFEX response did not contain FEXAuthorizeResult.');
+  }
+
+  if (!result.FEXResultAuth) {
+    const erroresOnly = mapErrors(result.FEXErr);
+    if (erroresOnly.length === 0) {
+      throw new WsfexError('UNKNOWN', 'WSFEX response did not contain FEXResultAuth or FEXErr.');
+    }
+    // Structural rejection: ARCA refused before assigning a comprobante
+    // number (e.g. schema validation failed). Surface as a rechazado with
+    // cabecera fields zeroed out so the caller sees the error message
+    // instead of an opaque exception.
+    return {
+      status: 'rechazado',
+      numeroComprobante: 0,
+      tipoComprobante: 19,
+      puntoVenta: 0,
+      errores: erroresOnly,
+      observaciones: [],
+    };
   }
 
   const auth = result.FEXResultAuth;
