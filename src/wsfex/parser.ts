@@ -345,8 +345,17 @@ function isNotFoundMessage(msg: string): boolean {
 }
 
 function fromWsfexDate(input: string): string {
-  if (!input || !/^\d{8}$/.test(input)) return '';
-  return `${input.slice(0, 4)}-${input.slice(4, 6)}-${input.slice(6, 8)}`;
+  if (!input) return '';
+  // ARCA's homologation has been observed to return ISO yyyy-mm-dd for
+  // Fecha_ctz even though the docs only mention compact yyyymmdd. Accept
+  // both so a real response and the local fixtures both round-trip.
+  if (/^\d{4}-\d{2}-\d{2}/.test(input)) {
+    return input.slice(0, 10);
+  }
+  if (/^\d{8}$/.test(input)) {
+    return `${input.slice(0, 4)}-${input.slice(4, 6)}-${input.slice(6, 8)}`;
+  }
+  return '';
 }
 
 function parseIntOr(value: string | undefined, fallback: number): number {
