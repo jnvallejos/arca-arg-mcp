@@ -74,7 +74,10 @@ describe('parseFeCaeResponse', () => {
   });
 
   it("treats Resultado='P' (parcial) as a Rechazado in V1", () => {
-    const partial = success.replace('<Resultado>A</Resultado>', '<Resultado>P</Resultado>');
+    const partial = success.replaceAll(
+      '<Resultado>A</Resultado>',
+      '<Resultado>P</Resultado>',
+    );
     const r = parseFeCaeResponse(partial);
     expect(r.status).toBe('rechazado');
   });
