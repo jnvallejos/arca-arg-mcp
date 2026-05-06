@@ -238,4 +238,18 @@ describe('parser fallback branches', () => {
     if (r.status !== 'aprobado') return;
     expect(r.fechaComprobante).toBe('');
   });
+
+  it('GetCmp surfaces FEXEvents into observaciones with EventCode/EventMsg', () => {
+    const xml = getCmpFound.replace(
+      '</FEXResultGet>',
+      `</FEXResultGet>
+        <FEXEvents>
+          <EventCode>1100</EventCode>
+          <EventMsg>Mensaje informativo de ARCA</EventMsg>
+        </FEXEvents>`,
+    );
+    const r = parseFexGetCmpResponse(xml);
+    expect(r.observaciones).toHaveLength(1);
+    expect(r.observaciones[0]).toEqual({ code: 1100, message: 'Mensaje informativo de ARCA' });
+  });
 });

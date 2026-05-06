@@ -41,6 +41,11 @@ interface RawErr {
   ErrMsg?: string;
 }
 
+interface RawEvent {
+  EventCode?: string;
+  EventMsg?: string;
+}
+
 interface RawAuthResultAuth {
   Cuit?: string;
   Cbte_Tipo?: string;
@@ -175,6 +180,7 @@ interface RawGetCmpResultGet {
 interface RawGetCmpResult {
   FEXResultGet?: RawGetCmpResultGet;
   FEXErr?: RawErr[];
+  FEXEvents?: RawEvent[];
 }
 
 /**
@@ -217,7 +223,7 @@ export function parseFexGetCmpResponse(xml: string): ComprobanteExportacionConsu
       idImpositivoExterior: r.Id_impositivo || undefined,
     },
     items: mapItems(r.Items?.Item),
-    observaciones: [],
+    observaciones: mapEvents(result.FEXEvents),
   };
 }
 
@@ -280,6 +286,13 @@ function mapErrors(raw: RawErr[] | undefined): ObservacionWsfex[] {
   return raw
     .filter((o) => o && (o.ErrCode !== undefined || o.ErrMsg !== undefined))
     .map((o) => ({ code: parseIntOr(o.ErrCode, 0), message: o.ErrMsg ?? '' }));
+}
+
+function mapEvents(raw: RawEvent[] | undefined): ObservacionWsfex[] {
+  if (!raw) return [];
+  return raw
+    .filter((e) => e && (e.EventCode !== undefined || e.EventMsg !== undefined))
+    .map((e) => ({ code: parseIntOr(e.EventCode, 0), message: e.EventMsg ?? '' }));
 }
 
 function mapMotivosObs(text: string | undefined): ObservacionWsfex[] {
