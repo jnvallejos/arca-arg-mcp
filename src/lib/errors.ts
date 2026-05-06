@@ -52,3 +52,22 @@ export class PadronError extends ArcaError {
     this.code = code;
   }
 }
+
+export type WsfeErrorCode = 'NOT_FOUND' | 'AUTH_FAILED' | 'SERVICE_UNAVAILABLE' | 'UNKNOWN';
+
+/**
+ * Thrown when the WSFE service rejects a request at the protocol level
+ * (network error, auth failure, malformed response) or when a `consultar`
+ * lookup cannot find the requested comprobante. Business rejections returned
+ * by ARCA (`Resultado='R'`) are NOT modeled as errors — they surface as a
+ * `ComprobanteRechazado` discriminated-union variant from the parser.
+ */
+export class WsfeError extends ArcaError {
+  public readonly code: WsfeErrorCode;
+
+  constructor(code: WsfeErrorCode, message: string) {
+    super(message);
+    this.name = 'WsfeError';
+    this.code = code;
+  }
+}

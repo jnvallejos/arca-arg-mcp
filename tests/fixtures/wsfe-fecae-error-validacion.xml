@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <FECAESolicitarResponse xmlns="http://ar.gov.afip.dif.FEV1/">
+      <FECAESolicitarResult>
+        <FeCabResp>
+          <Cuit>20239312345</Cuit>
+          <PtoVta>1</PtoVta>
+          <CbteTipo>6</CbteTipo>
+          <FchProceso>20260415123000</FchProceso>
+          <CantReg>1</CantReg>
+          <Resultado>R</Resultado>
+          <Reproceso>N</Reproceso>
+        </FeCabResp>
+        <FeDetResp>
+          <FECAEDetResponse>
+            <Concepto>1</Concepto>
+            <DocTipo>99</DocTipo>
+            <DocNro>0</DocNro>
+            <CbteDesde>0</CbteDesde>
+            <CbteHasta>0</CbteHasta>
+            <CbteFch></CbteFch>
+            <Resultado>R</Resultado>
+            <CAE></CAE>
+            <CAEFchVto></CAEFchVto>
+            <Observaciones>
+              <Obs>
+                <Code>10018</Code>
+                <Msg>Error de validacion: importes no consistentes.</Msg>
+              </Obs>
+            </Observaciones>
+          </FECAEDetResponse>
+        </FeDetResp>
+        <Errors>
+          <Err>
+            <Code>1006</Code>
+            <Msg>Error de schema en el campo CbteFch: vacio.</Msg>
+          </Err>
+        </Errors>
+      </FECAESolicitarResult>
+    </FECAESolicitarResponse>
+  </soap:Body>
+</soap:Envelope>
