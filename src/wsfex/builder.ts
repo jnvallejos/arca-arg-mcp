@@ -11,13 +11,13 @@ import type {
  * plus an explicit comprobante number (resolved by the tool layer).
  *
  * Pure function. Forces project invariants: `Cuit_pais_cliente=0`, empty
- * `Permisos`/`Cmps_asoc`/`Opcionales` arrays (PERMISO_EMBARQUE / CmpAsoc /
- * Opcionales are deferred to V2). `Permiso_existente` is `'N'` only when the
- * comprobante is for goods (`concepto=1`, `Tipo_expo=1`); for services
- * (`concepto=2`) or others (`concepto=4`) it is sent empty per ARCA's
- * validation rules. Numeric importes are rounded defensively to 2 decimals;
- * `Pro_qty` keeps up to 6 decimals so fractional-hour services round-trip
- * cleanly.
+ * `Cmps_asoc`/`Opcionales` arrays (CmpAsoc / Opcionales are deferred to V2).
+ * When `concepto` is 1 (goods), `Permiso_existente='N'` and an empty
+ * `Permisos` array are included. When `concepto` is 2 (services) or 4
+ * (other), both fields are omitted from the request entirely per ARCA error
+ * 1736 ("No es posible informar estos campos con tipo_expo=2 ó 4").
+ * Numeric importes are rounded defensively to 2 decimals; `Pro_qty` keeps up
+ * to 6 decimals so fractional-hour services round-trip cleanly.
  *
  * The `authenticatedCuit` parameter is kept in the signature so the SOAP
  * client can pass it as part of the `Auth` envelope; it is not stamped into
@@ -35,7 +35,9 @@ export function buildFexAuthorizeRequest(
     Punto_vta: input.puntoVenta,
     Cbte_nro: numeroComprobante,
     Tipo_expo: input.concepto,
-    Permiso_existente: input.concepto === 1 ? 'N' : '',
+    ...(input.concepto === 1
+      ? { Permiso_existente: 'N' as const, Permisos: { Permiso: [] } }
+      : {}),
     Dst_cmp: input.destinoPais,
     Cliente: input.cliente.nombre,
     Cuit_pais_cliente: 0,
@@ -44,7 +46,6 @@ export function buildFexAuthorizeRequest(
     Moneda_ctz: input.cotizacion,
     Imp_total: round2(input.importeTotal),
     Idioma_cbte: input.idiomaComprobante,
-    Permisos: { Permiso: [] },
     Cmps_asoc: { Cmp_asoc: [] },
     Opcionales: { Opcional: [] },
     Items: { Item: input.items.map(toFexItem) },
