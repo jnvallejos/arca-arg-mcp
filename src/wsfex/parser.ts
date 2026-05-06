@@ -249,9 +249,8 @@ export function parseFexGetCmpResponse(xml: string): ComprobanteExportacionConsu
 }
 
 interface RawCtzResultGet {
-  Mon_id?: string;
   Mon_ctz?: string;
-  Fecha_ctz?: string;
+  Mon_fecha?: string;
 }
 
 interface RawCtzResult {
@@ -261,8 +260,15 @@ interface RawCtzResult {
 
 /**
  * Parses a `FEXGetPARAM_CtzResponse` XML document into a `CotizacionMoneda`.
+ *
+ * ARCA's real `FEXResultGet` returns `Mon_ctz` and `Mon_fecha`; it does NOT
+ * echo `Mon_id`, so the caller passes the requested `monedaId` and the parser
+ * stamps it onto the result.
  */
-export function parseFexGetParamCtzResponse(xml: string): CotizacionMoneda {
+export function parseFexGetParamCtzResponse(
+  xml: string,
+  monedaId: CodigoMoneda,
+): CotizacionMoneda {
   const root = parseRoot(xml);
   const result = findResult<RawCtzResult>(root, 'FEXGetPARAM_CtzResult');
   if (!result || !result.FEXResultGet) {
@@ -270,9 +276,9 @@ export function parseFexGetParamCtzResponse(xml: string): CotizacionMoneda {
   }
   const r = result.FEXResultGet;
   return {
-    moneda: (r.Mon_id ?? 'DOL') as CodigoMoneda,
+    moneda: monedaId,
     cotizacion: parseFloatOr(r.Mon_ctz, 0),
-    fechaCotizacion: fromWsfexDate(r.Fecha_ctz ?? ''),
+    fechaCotizacion: fromWsfexDate(r.Mon_fecha ?? ''),
   };
 }
 

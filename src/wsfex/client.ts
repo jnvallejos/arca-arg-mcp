@@ -174,7 +174,10 @@ export async function fexGetParamCtz(
   );
 
   const xml = extractRawResponse(raw);
-  return safeParse(() => parseFexGetParamCtzResponse(xml), 'parse FEXGetPARAM_Ctz response');
+  return safeParse(
+    () => parseFexGetParamCtzResponse(xml, monedaId),
+    'parse FEXGetPARAM_Ctz response',
+  );
 }
 
 async function loadClient(config: ArcaConfig): Promise<WsfexSoapClient> {
