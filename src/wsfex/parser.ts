@@ -14,15 +14,16 @@ import type {
 } from './types.js';
 
 /**
- * `FEXAuthorizeResponse` does not include `Imp_total`, `Moneda_Id`, or
- * `Moneda_ctz` in `FEXResultAuth`, so the parser cannot produce a fully
- * formed `ComprobanteExportacionAutorizado`. The client is responsible for
- * stamping those fields from the original request after parsing. Same lesson
- * learned from Phase 3's `importeTotal` fix-up.
+ * `FEXAuthorizeResponse` does not include `Imp_total`, `Moneda_Id`,
+ * `Moneda_ctz`, `Cliente`, `Domicilio_cliente`, `Id_impositivo`, or `Dst_cmp`
+ * in `FEXResultAuth`, so the parser cannot produce a fully formed
+ * `ComprobanteExportacionAutorizado`. The client is responsible for stamping
+ * those fields from the original request after parsing. Same lesson learned
+ * from Phase 3's `importeTotal` fix-up.
  */
 type ParsedAprobado = Omit<
   ComprobanteExportacionAutorizado,
-  'importeTotal' | 'moneda' | 'cotizacion'
+  'importeTotal' | 'moneda' | 'cotizacion' | 'cliente' | 'destinoPais'
 >;
 export type ParsedResultadoExportacion = ParsedAprobado | ComprobanteExportacionRechazado;
 
@@ -72,9 +73,10 @@ interface RawAuthResult {
  * surface the outcome to the user. Throws {@link WsfexError} only for
  * unparseable XML or structurally malformed responses.
  *
- * The `aprobado` variant intentionally omits `importeTotal`, `moneda`, and
- * `cotizacion` because `FEXAuthorizeResponse` does not echo them. The client
- * stamps those fields from the original request.
+ * The `aprobado` variant intentionally omits `importeTotal`, `moneda`,
+ * `cotizacion`, `cliente`, and `destinoPais` because `FEXAuthorizeResponse`
+ * does not echo them. The client stamps those fields from the original
+ * request.
  */
 export function parseFexAuthorizeResponse(xml: string): ParsedResultadoExportacion {
   const root = parseRoot(xml);
