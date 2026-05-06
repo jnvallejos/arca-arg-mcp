@@ -93,9 +93,7 @@ describe('CONDICIONES_IVA_RECEPTOR', () => {
   });
 
   it('labels code 16 as Monotributo Trabajador Independiente Promovido', () => {
-    expect(CONDICIONES_IVA_RECEPTOR[16]).toBe(
-      'Monotributo Trabajador Independiente Promovido',
-    );
+    expect(CONDICIONES_IVA_RECEPTOR[16]).toBe('Monotributo Trabajador Independiente Promovido');
   });
 
   it('does not include legacy or unsupported codes', () => {
