@@ -61,7 +61,9 @@ describe('formatResultadoEmisionExportacion (APROBADO)', () => {
   });
 
   it('formats foreign-currency importe in en-US format with prefix', () => {
-    const out = formatResultadoEmisionExportacion(makeAprobado({ importeTotal: 5000, moneda: 'DOL' }));
+    const out = formatResultadoEmisionExportacion(
+      makeAprobado({ importeTotal: 5000, moneda: 'DOL' }),
+    );
     expect(out).toContain('USD 5,000.00');
   });
 

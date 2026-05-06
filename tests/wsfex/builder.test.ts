@@ -53,11 +53,7 @@ describe('buildFexAuthorizeRequest', () => {
   });
 
   it('converts YYYY-MM-DD to YYYYMMDD in Fecha_cbte', () => {
-    const r = buildFexAuthorizeRequest(
-      baseInput({ fechaComprobante: '2026-04-15' }),
-      AUTH_CUIT,
-      1,
-    );
+    const r = buildFexAuthorizeRequest(baseInput({ fechaComprobante: '2026-04-15' }), AUTH_CUIT, 1);
     expect(r.Cmp.Fecha_cbte).toBe('20260415');
   });
 
@@ -208,11 +204,7 @@ describe('buildFexAuthorizeRequest', () => {
   });
 
   it('includes Fecha_pago when provided (converted to YYYYMMDD)', () => {
-    const r = buildFexAuthorizeRequest(
-      baseInput({ fechaPago: '2026-05-15' }),
-      AUTH_CUIT,
-      1,
-    );
+    const r = buildFexAuthorizeRequest(baseInput({ fechaPago: '2026-05-15' }), AUTH_CUIT, 1);
     expect(r.Cmp.Fecha_pago).toBe('20260515');
   });
 

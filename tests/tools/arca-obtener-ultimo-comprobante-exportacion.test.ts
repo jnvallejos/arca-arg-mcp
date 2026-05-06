@@ -55,9 +55,7 @@ describe('arca_obtener_ultimo_comprobante_exportacion tool', () => {
     const { handleArcaObtenerUltimoComprobanteExportacion } = await import(
       '../../src/tools/arca-obtener-ultimo-comprobante-exportacion.js'
     );
-    await expect(
-      handleArcaObtenerUltimoComprobanteExportacion(makeConfig(), {}),
-    ).rejects.toThrow();
+    await expect(handleArcaObtenerUltimoComprobanteExportacion(makeConfig(), {})).rejects.toThrow();
   });
 
   it('returns formatted output', async () => {

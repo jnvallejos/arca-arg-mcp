@@ -32,20 +32,7 @@ export const arcaObtenerCotizacionMonedaTool: Tool = {
     properties: {
       moneda: {
         type: 'string',
-        enum: [
-          'DOL',
-          '060',
-          '002',
-          '006',
-          '010',
-          '011',
-          '012',
-          '014',
-          '019',
-          '030',
-          '031',
-          '091',
-        ],
+        enum: ['DOL', '060', '002', '006', '010', '011', '012', '014', '019', '030', '031', '091'],
         description:
           'Código WSFEX. DOL=USD, 060=EUR, 002=GBP, 006=BRL, 010=CLP, 011=UYU, 012=JPY, 014=CNY, 019=KRW, 030=CHF, 031=MXN, 091=CAD.',
       },
