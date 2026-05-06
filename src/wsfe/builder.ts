@@ -55,6 +55,7 @@ function buildDetail(input: EmitirFacturaInput, numero: number): FeCaeDetRequest
     ImpTrib: 0,
     MonId: 'PES',
     MonCotiz: 1,
+    CondicionIVAReceptorId: input.condicionIvaReceptor,
   };
 
   if (input.concepto === 2 || input.concepto === 3) {
