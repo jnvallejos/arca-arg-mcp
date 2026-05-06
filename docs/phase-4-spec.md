@@ -412,7 +412,8 @@ Pure function. Takes the validated input plus the authenticated CUIT and an expl
 2. Build the `Items` array, mapping camelCase to WSFEX's PascalCase (`Pro_codigo`, `Pro_ds`, `Pro_qty`, etc.)
 3. Build the `Cmp` envelope with:
    - `Cbte_Tipo: 19`
-   - `Punto_vta`, `Cbte_nro`, `Tipo_expo`, `Permiso_existente: 'N'` (export of services)
+   - `Punto_vta`, `Cbte_nro`, `Tipo_expo`
+   - `Permiso_existente`: `'N'` when `Tipo_expo=1` (Productos), empty string `''` when `Tipo_expo=2` (Servicios) or `Tipo_expo=4` (Otros). ARCA validation rejects `'N'` for services/others with code `1550`.
    - `Dst_cmp`, `Cliente`, `Cuit_pais_cliente: 0` (no CUIT for foreign client)
    - `Domicilio_cliente`, `Id_impositivo` (if provided)
    - `Moneda_Id`, `Moneda_ctz`
@@ -426,7 +427,7 @@ Pure function. Takes the validated input plus the authenticated CUIT and an expl
 **Decisions:**
 - Builder rejects negative quantities, prices, totals via TypeScript types (input already validated by Zod)
 - All numeric fields rounded to 2 decimals defensively, except `Pro_qty` which can have up to 6 decimals (WSFEX accepts decimals for cantidad)
-- The `Permiso_existente='N'` is hardcoded since V1 doesn't support PERMISO_EMBARQUE
+- `Permiso_existente` is derived from `concepto`: `'N'` for goods (concepto 1), `''` for services or others (concepto 2 or 4). PERMISO_EMBARQUE itself is still deferred to V2; the field only signals to ARCA whether it should expect a permit at all.
 
 ### 5.2 `src/wsfex/parser.ts`
 
@@ -448,6 +449,8 @@ WSFEX returns `FEXResultAuth.Resultado` with values:
 (WSFEX does not have a `'P'` partial state; only A/R.)
 
 `Observaciones` and `Errors` may both be present even on success. Preserved.
+
+**Structural rejections without `FEXResultAuth`:** when ARCA refuses a request before assigning a comprobante number (e.g. schema validation on a field like `Permiso_existente`), `FEXAuthorizeResult` contains a populated `FEXErr` block but no `FEXResultAuth`. Parser surfaces this as a `ComprobanteExportacionRechazado` with `numeroComprobante=0`, `puntoVenta=0`, `tipoComprobante=19`, the parsed `errores`, and empty `observaciones`. Only when both `FEXResultAuth` AND `FEXErr` are missing does the parser throw `WsfexError('UNKNOWN', ...)`.
 
 ### 5.3 `src/wsfex/formatter.ts`
 
@@ -675,7 +678,7 @@ Same coverage targets as Phase 3 (>85% on all surface). Tests follow same naming
 #### `tests/wsfex/builder.test.ts`
 - Maps fields to WSFEX names (Pro_codigo, Cmp.Moneda_Id, etc.)
 - Forces empty Permisos, CmpAsoc, Opcionales arrays
-- Permiso_existente='N' always
+- Permiso_existente derived from concepto: 'N' for productos, '' for servicios/otros
 - Cuit_pais_cliente=0 always
 - Includes Fecha_pago when provided
 - Omits Fecha_pago when not provided
