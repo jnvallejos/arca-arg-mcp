@@ -17,6 +17,8 @@ export const WSFE_ERROR_HINTS: Record<number, string> = {
     'El receptor no admite ese tipo de comprobante (por ejemplo, Consumidor Final no admite Factura A con totales altos).',
   10048:
     'Para concepto 2 (Servicios) o 3 (Productos y Servicios) hay que enviar fecha de servicio desde, hasta y vencimiento de pago.',
+  10246:
+    'El campo "Condición frente al IVA del receptor" es obligatorio (RG 5616). Pasalo en `condicionIvaReceptor` con el código correspondiente al receptor (1=RI, 5=Consumidor Final, 6=Monotributo, etc.).',
 };
 
 /**
