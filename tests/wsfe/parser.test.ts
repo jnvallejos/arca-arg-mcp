@@ -125,6 +125,20 @@ describe('parseFeCompConsultarResponse', () => {
     expect(r.numeroDocReceptor).toBe('0');
   });
 
+  it('parses CondicionIVAReceptorId from the response when present', () => {
+    const r = parseFeCompConsultarResponse(consultarFound);
+    expect(r.condicionIvaReceptor).toBe(5);
+  });
+
+  it('leaves condicionIvaReceptor undefined when the tag is absent', () => {
+    const xml = consultarFound.replace(
+      /<CondicionIVAReceptorId>\d+<\/CondicionIVAReceptorId>\s*/,
+      '',
+    );
+    const r = parseFeCompConsultarResponse(xml);
+    expect(r.condicionIvaReceptor).toBeUndefined();
+  });
+
   it('throws WsfeError(NOT_FOUND) when the response indicates no comprobante exists', () => {
     expect(() => parseFeCompConsultarResponse(consultarNotFound)).toThrow(WsfeError);
     try {

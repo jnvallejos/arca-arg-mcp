@@ -23,6 +23,7 @@
           <EmisionTipo>CAE</EmisionTipo>
           <PtoVta>1</PtoVta>
           <CbteTipo>6</CbteTipo>
+          <CondicionIVAReceptorId>5</CondicionIVAReceptorId>
           <Resultado>A</Resultado>
         </ResultGet>
       </FECompConsultarResult>
