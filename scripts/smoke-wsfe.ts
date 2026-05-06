@@ -73,6 +73,7 @@ async function main(): Promise<void> {
     concepto: 1,
     tipoDocReceptor: 99,
     numeroDocReceptor: '0',
+    condicionIvaReceptor: 5,
     fechaComprobante: todayIsoDate(),
     importeNeto: 100,
     iva: [{ alicuota: '21', baseImponible: 100, importe: 21 }],
