@@ -57,9 +57,19 @@ describe('buildFexAuthorizeRequest', () => {
     expect(r.Cmp.Fecha_cbte).toBe('20260415');
   });
 
-  it('forces Permiso_existente="N" (no PERMISO_EMBARQUE in V1)', () => {
-    const r = buildFexAuthorizeRequest(baseInput(), AUTH_CUIT, 1);
+  it('sets Permiso_existente to N for concepto=1 (Productos)', () => {
+    const r = buildFexAuthorizeRequest(baseInput({ concepto: 1 }), AUTH_CUIT, 1);
     expect(r.Cmp.Permiso_existente).toBe('N');
+  });
+
+  it('sets Permiso_existente to empty for concepto=2 (Servicios)', () => {
+    const r = buildFexAuthorizeRequest(baseInput({ concepto: 2 }), AUTH_CUIT, 1);
+    expect(r.Cmp.Permiso_existente).toBe('');
+  });
+
+  it('sets Permiso_existente to empty for concepto=4 (Otros)', () => {
+    const r = buildFexAuthorizeRequest(baseInput({ concepto: 4 }), AUTH_CUIT, 1);
+    expect(r.Cmp.Permiso_existente).toBe('');
   });
 
   it('forces Permisos to be an empty Permiso array', () => {
