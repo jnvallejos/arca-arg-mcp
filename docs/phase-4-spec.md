@@ -252,9 +252,11 @@ export interface ComprobanteExportacionAutorizado {
   tipoComprobante: 19;
   puntoVenta: number;
   fechaComprobante: string;
-  importeTotal: number;            // foreign currency
-  moneda: CodigoMoneda;
-  cotizacion: number;
+  importeTotal: number;            // foreign currency, stamped from the original request
+  moneda: CodigoMoneda;            // stamped from the original request
+  cotizacion: number;              // stamped from the original request
+  cliente: ClienteExportacion;     // stamped from the original request
+  destinoPais: CodigoPais;         // stamped from the original request
 }
 
 export interface ComprobanteExportacionRechazado {
@@ -523,7 +525,7 @@ Same pattern as WSFE: get TA via `getValidToken(config, 'wsfex')`, build Auth en
 
 **Same stamping pattern as WSFE Phase 3 fix:**
 
-`fexAuthorize` stamps `importeTotal`, `moneda`, and `cotizacion` from the request onto the `ComprobanteExportacionAutorizado` (since WSFEX's `FEXAuthorize` response also doesn't echo these fields). This is the same lesson learned from Phase 3's `importeTotal` fix-up.
+`fexAuthorize` stamps `importeTotal`, `moneda`, `cotizacion`, `cliente`, and `destinoPais` from the request onto the `ComprobanteExportacionAutorizado` (since WSFEX's `FEXAuthorize` response also doesn't echo these fields). This is the same lesson learned from Phase 3's `importeTotal` fix-up.
 
 **No retries in V1.**
 
