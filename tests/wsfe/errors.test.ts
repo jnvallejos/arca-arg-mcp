@@ -43,6 +43,12 @@ describe('WSFE_ERROR_HINTS table', () => {
     expect(WSFE_ERROR_HINTS[10048]).toBeDefined();
   });
 
+  it('includes a hint for code 10246 (Condición IVA Receptor obligatoria, RG 5616)', () => {
+    expect(WSFE_ERROR_HINTS[10246]).toBeDefined();
+    expect(WSFE_ERROR_HINTS[10246]).toMatch(/condicionIvaReceptor/);
+    expect(WSFE_ERROR_HINTS[10246]).toMatch(/RG 5616/);
+  });
+
   it('all hints are non-empty Spanish strings', () => {
     for (const code of Object.keys(WSFE_ERROR_HINTS)) {
       const hint = WSFE_ERROR_HINTS[Number(code)];
