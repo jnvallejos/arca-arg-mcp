@@ -116,6 +116,34 @@ V1 supports all of these on input. For Factura B with low totals, `99` (Consumid
 
 `Tributos` is an optional collection in the request (e.g. impuestos internos, percepciones provinciales). **Out of scope for V1.** The tool input does not expose it; the request always sends an empty `Tributos` array. If a user needs tributos, that is V2.
 
+### 2.10 Condición Frente al IVA del Receptor (RG 5616)
+
+Resolución General N° 5616 (in force in production) makes the receiver's IVA condition mandatory for every comprobante. The field is sent in WSFE as `CondicionIVAReceptorId`. Without it, ARCA rejects the comprobante with observation code `10246`:
+
+> "Campo Condicion Frente al IVA del receptor es obligatorio conforme a lo reglamentado por la Resolucion General Nro 5616. Para mas informacion consular metodo FEParamGetCondicionIvaReceptor"
+
+The 11 codes accepted by `FEParamGetCondicionIvaReceptor`:
+
+| Código | Condición |
+|---|---|
+| 1 | IVA Responsable Inscripto |
+| 4 | IVA Sujeto Exento |
+| 5 | Consumidor Final |
+| 6 | Responsable Monotributo |
+| 7 | Sujeto No Categorizado |
+| 8 | Proveedor del Exterior |
+| 9 | Cliente del Exterior |
+| 10 | IVA Liberado - Ley Nº 19.640 |
+| 13 | Monotributista Social |
+| 15 | IVA No Alcanzado |
+| 16 | Monotributo Trabajador Independiente Promovido |
+
+**Decisions:**
+
+- The field is **mandatory** in the tool input (`condicionIvaReceptor`). No defaults, no auto-fill based on `tipoDocReceptor`. Explicit > implicit. The LLM (or human caller) must supply it.
+- **No cross-validation** between `tipoComprobante` and `condicionIvaReceptor` in our code. ARCA owns the matrix of which condición is allowed for which tipo de comprobante and may change it. We pass the value through and let ARCA reject if invalid; the error hint table surfaces 10246 clearly if ARCA ever returns it.
+- Static table — never queried at runtime via `FEParamGetCondicionIvaReceptor`.
+
 ---
 
 ## 3. Folder Structure
@@ -184,6 +212,8 @@ export type TipoComprobante = 1 | 6 | 11;       // V1: Factura A, B, C only
 export type Concepto = 1 | 2 | 3;
 export type TipoDocReceptor = 80 | 86 | 87 | 89 | 90 | 91 | 96 | 99;
 export type AlicuotaIva = '0' | '2.5' | '5' | '10.5' | '21' | '27';
+/** Condición frente al IVA del receptor (RG 5616). */
+export type CondicionIvaReceptor = 1 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 13 | 15 | 16;
 
 export interface IvaItem {
   alicuota: AlicuotaIva;
@@ -199,6 +229,7 @@ export interface EmitirFacturaInput {
   concepto: Concepto;
   tipoDocReceptor: TipoDocReceptor;
   numeroDocReceptor: string;        // for ConsumidorFinal (99): '0'
+  condicionIvaReceptor: CondicionIvaReceptor; // mandatory per RG 5616
   fechaComprobante: string;         // YYYY-MM-DD
   importeNeto: number;              // ARS, for IVA-bearing invoices (Factura A/B); omit for C
   iva?: IvaItem[];                  // omit for Factura C
@@ -478,6 +509,10 @@ const inputSchema = z.object({
     z.literal(90), z.literal(91), z.literal(96), z.literal(99),
   ]),
   numeroDocReceptor: z.string().regex(/^\d+$/),
+  condicionIvaReceptor: z.union([
+    z.literal(1), z.literal(4), z.literal(5), z.literal(6), z.literal(7),
+    z.literal(8), z.literal(9), z.literal(10), z.literal(13), z.literal(15), z.literal(16),
+  ]),
   fechaComprobante: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   importeNeto: z.number().nonnegative(),
   iva: z.array(z.object({
@@ -886,6 +921,7 @@ A trailing `chore` for biome auto-fix is acceptable.
 - **Do not** add NPM packages. Phase 3 reuses Phase 1/2 deps.
 - **Do not** wire `npm run smoke` (or `smoke:wsfe`) into CI.
 - **Do not** print the CAE value in smoke output. Length only.
+- **Do not** auto-default `condicionIvaReceptor` based on `tipoDocReceptor` or anything else. The field is required and explicit.
 
 ---
 
