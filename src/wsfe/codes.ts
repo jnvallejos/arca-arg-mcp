@@ -38,3 +38,21 @@ export const TIPOS_DOC_RECEPTOR = {
   96: 'DNI',
   99: 'Consumidor Final / Sin identificar',
 } as const;
+
+/**
+ * Receiver IVA condition codes mandated by Resolución General N° 5616.
+ * Mirrors `FEParamGetCondicionIvaReceptor`. Static — never queried at runtime.
+ */
+export const CONDICIONES_IVA_RECEPTOR = {
+  1: 'IVA Responsable Inscripto',
+  4: 'IVA Sujeto Exento',
+  5: 'Consumidor Final',
+  6: 'Responsable Monotributo',
+  7: 'Sujeto No Categorizado',
+  8: 'Proveedor del Exterior',
+  9: 'Cliente del Exterior',
+  10: 'IVA Liberado - Ley Nº 19.640',
+  13: 'Monotributista Social',
+  15: 'IVA No Alcanzado',
+  16: 'Monotributo Trabajador Independiente Promovido',
+} as const;

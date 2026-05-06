@@ -10,6 +10,9 @@ export type TipoDocReceptor = 80 | 86 | 87 | 89 | 90 | 91 | 96 | 99;
 /** Argentine IVA rate labels accepted by the tool input. */
 export type AlicuotaIva = '0' | '2.5' | '5' | '10.5' | '21' | '27';
 
+/** Condición frente al IVA del receptor (RG 5616). */
+export type CondicionIvaReceptor = 1 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 13 | 15 | 16;
+
 export interface IvaItem {
   alicuota: AlicuotaIva;
   /** ARS amount before IVA. */
@@ -35,6 +38,8 @@ export interface EmitirFacturaInput {
   tipoDocReceptor: TipoDocReceptor;
   /** Receiver document number. For Consumidor Final (99) use `'0'`. */
   numeroDocReceptor: string;
+  /** Receiver's IVA condition code (RG 5616). Required. */
+  condicionIvaReceptor: CondicionIvaReceptor;
   /** YYYY-MM-DD. */
   fechaComprobante: string;
   /** ARS amount before IVA. Always present (`0` for Factura C with no taxable base). */
@@ -103,6 +108,7 @@ export interface ComprobanteConsultado {
   concepto: Concepto;
   tipoDocReceptor: TipoDocReceptor;
   numeroDocReceptor: string;
+  condicionIvaReceptor?: CondicionIvaReceptor;
   observaciones: ObservacionWsfe[];
 }
 
@@ -129,6 +135,7 @@ export interface FeCaeDetRequest {
   ImpTrib: number;
   MonId: 'PES';
   MonCotiz: 1;
+  CondicionIVAReceptorId: number;
   FchServDesde?: string;
   FchServHasta?: string;
   FchVtoPago?: string;
