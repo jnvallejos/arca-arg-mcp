@@ -163,6 +163,30 @@ describe('parseFexGetParamCtzResponse', () => {
     expect(r.fechaCotizacion).toBe('2026-04-15');
   });
 
+  it('parses Fecha_ctz in compact yyyymmdd format', () => {
+    const xml = getCtz.replace('<Fecha_ctz>20260415</Fecha_ctz>', '<Fecha_ctz>20260415</Fecha_ctz>');
+    const r = parseFexGetParamCtzResponse(xml);
+    expect(r.fechaCotizacion).toBe('2026-04-15');
+  });
+
+  it('parses Fecha_ctz in ISO yyyy-mm-dd format', () => {
+    const xml = getCtz.replace(
+      '<Fecha_ctz>20260415</Fecha_ctz>',
+      '<Fecha_ctz>2026-04-15</Fecha_ctz>',
+    );
+    const r = parseFexGetParamCtzResponse(xml);
+    expect(r.fechaCotizacion).toBe('2026-04-15');
+  });
+
+  it('returns empty string for unknown date format', () => {
+    const xml = getCtz.replace(
+      '<Fecha_ctz>20260415</Fecha_ctz>',
+      '<Fecha_ctz>15/04/2026</Fecha_ctz>',
+    );
+    const r = parseFexGetParamCtzResponse(xml);
+    expect(r.fechaCotizacion).toBe('');
+  });
+
   it('throws WsfexError when the response is malformed', () => {
     expect(() => parseFexGetParamCtzResponse('<bad')).toThrow(WsfexError);
   });
