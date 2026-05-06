@@ -61,6 +61,13 @@ function formatAprobado(r: ComprobanteExportacionAutorizado): string {
   lines.push(`Número: ${formatNumero(r.numeroComprobante)}`);
   lines.push(`Fecha: ${formatArgDate(r.fechaComprobante)}`);
   lines.push('');
+  lines.push(`Cliente: ${r.cliente.nombre}`);
+  if (r.cliente.idImpositivoExterior) {
+    lines.push(`ID impositivo: ${r.cliente.idImpositivoExterior}`);
+  }
+  lines.push(`Domicilio: ${r.cliente.domicilio}`);
+  lines.push(`Destino: ${paisLabel(r.destinoPais)}`);
+  lines.push('');
   lines.push(
     `Importe total: ${formatMonto(r.importeTotal, r.moneda)} (cotización ${ARS_FORMAT.format(r.cotizacion)} ARS)`,
   );
