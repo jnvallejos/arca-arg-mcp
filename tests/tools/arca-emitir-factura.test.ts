@@ -33,6 +33,7 @@ function baseFacturaB(overrides: Partial<EmitirFacturaInput> = {}): EmitirFactur
     concepto: 1,
     tipoDocReceptor: 99,
     numeroDocReceptor: '0',
+    condicionIvaReceptor: 5,
     fechaComprobante: '2026-04-15',
     importeNeto: 100,
     iva: [{ alicuota: '21', baseImponible: 100, importe: 21 }],
@@ -167,6 +168,42 @@ describe('arca_emitir_factura tool', () => {
         tipoDocReceptor: 77,
       }),
     ).rejects.toThrow();
+  });
+
+  it('rejects request without condicionIvaReceptor', async () => {
+    const { handleArcaEmitirFactura } = await import('../../src/tools/arca-emitir-factura.js');
+    const { condicionIvaReceptor: _omit, ...withoutCondicion } = baseFacturaB();
+    await expect(handleArcaEmitirFactura(makeConfig(), withoutCondicion)).rejects.toThrow();
+    expect(feCaeSolicitarMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects request with invalid condicionIvaReceptor (e.g. 2)', async () => {
+    const { handleArcaEmitirFactura } = await import('../../src/tools/arca-emitir-factura.js');
+    await expect(
+      handleArcaEmitirFactura(makeConfig(), {
+        ...baseFacturaB(),
+        condicionIvaReceptor: 2 as never,
+      }),
+    ).rejects.toThrow();
+  });
+
+  it('rejects request with invalid condicionIvaReceptor (e.g. 99)', async () => {
+    const { handleArcaEmitirFactura } = await import('../../src/tools/arca-emitir-factura.js');
+    await expect(
+      handleArcaEmitirFactura(makeConfig(), {
+        ...baseFacturaB(),
+        condicionIvaReceptor: 99 as never,
+      }),
+    ).rejects.toThrow();
+  });
+
+  it('forwards condicionIvaReceptor into the SOAP request', async () => {
+    feCompUltimoAutorizadoMock.mockResolvedValue(ultimo(12344));
+    feCaeSolicitarMock.mockResolvedValue(aprobado());
+    const { handleArcaEmitirFactura } = await import('../../src/tools/arca-emitir-factura.js');
+    await handleArcaEmitirFactura(makeConfig(), { ...baseFacturaB(), condicionIvaReceptor: 6 });
+    const requestArg = feCaeSolicitarMock.mock.calls[0][0];
+    expect(requestArg.FeDetReq.FECAEDetRequest[0].CondicionIVAReceptorId).toBe(6);
   });
 
   it('auto-resolves numeroComprobante when not provided', async () => {
