@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   ALICUOTAS_IVA_CODE,
+  CONDICIONES_IVA_RECEPTOR,
   TIPOS_COMPROBANTE_V1,
   TIPOS_DOC_RECEPTOR,
 } from '../../src/wsfe/codes.js';
@@ -68,5 +69,39 @@ describe('TIPOS_DOC_RECEPTOR', () => {
 
   it('labels DNI (96)', () => {
     expect(TIPOS_DOC_RECEPTOR[96]).toBe('DNI');
+  });
+});
+
+describe('CONDICIONES_IVA_RECEPTOR', () => {
+  it('contains exactly the 11 RG 5616 codes', () => {
+    const keys = Object.keys(CONDICIONES_IVA_RECEPTOR)
+      .map((k) => Number(k))
+      .sort((a, b) => a - b);
+    expect(keys).toEqual([1, 4, 5, 6, 7, 8, 9, 10, 13, 15, 16]);
+  });
+
+  it('labels code 1 as IVA Responsable Inscripto', () => {
+    expect(CONDICIONES_IVA_RECEPTOR[1]).toBe('IVA Responsable Inscripto');
+  });
+
+  it('labels code 5 as Consumidor Final', () => {
+    expect(CONDICIONES_IVA_RECEPTOR[5]).toBe('Consumidor Final');
+  });
+
+  it('labels code 6 as Responsable Monotributo', () => {
+    expect(CONDICIONES_IVA_RECEPTOR[6]).toBe('Responsable Monotributo');
+  });
+
+  it('labels code 16 as Monotributo Trabajador Independiente Promovido', () => {
+    expect(CONDICIONES_IVA_RECEPTOR[16]).toBe(
+      'Monotributo Trabajador Independiente Promovido',
+    );
+  });
+
+  it('does not include legacy or unsupported codes', () => {
+    const unsupported = [0, 2, 3, 11, 12, 14, 17];
+    for (const code of unsupported) {
+      expect((CONDICIONES_IVA_RECEPTOR as Record<number, unknown>)[code]).toBeUndefined();
+    }
   });
 });
