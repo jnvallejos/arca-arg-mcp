@@ -5,6 +5,7 @@ import type {
   ComprobanteConsultado,
   ComprobanteRechazado,
   Concepto,
+  CondicionIvaReceptor,
   ObservacionWsfe,
   ResultadoEmision,
   TipoComprobante,
@@ -144,6 +145,7 @@ interface RawConsultarResult {
     FchVto?: string;
     PtoVta?: string;
     CbteTipo?: string;
+    CondicionIVAReceptorId?: string;
     Observaciones?: { Obs?: RawObs[] };
   };
   Errors?: { Err?: RawObs[] };
@@ -173,6 +175,15 @@ export function parseFeCompConsultarResponse(xml: string): ComprobanteConsultado
   }
 
   const r = result.ResultGet;
+  const condicionRaw = r.CondicionIVAReceptorId;
+  const condicionParsed =
+    condicionRaw === undefined || condicionRaw === ''
+      ? Number.NaN
+      : Number.parseInt(condicionRaw, 10);
+  const condicionIvaReceptor = Number.isNaN(condicionParsed)
+    ? undefined
+    : (condicionParsed as CondicionIvaReceptor);
+
   return {
     numeroComprobante: parseIntOr(r.CbteDesde, 0),
     tipoComprobante: parseIntOr(r.CbteTipo, 0) as TipoComprobante,
@@ -185,6 +196,7 @@ export function parseFeCompConsultarResponse(xml: string): ComprobanteConsultado
     concepto: parseIntOr(r.Concepto, 1) as Concepto,
     tipoDocReceptor: parseIntOr(r.DocTipo, 99) as TipoDocReceptor,
     numeroDocReceptor: r.DocNro ?? '0',
+    condicionIvaReceptor,
     observaciones: mapObservaciones(r.Observaciones?.Obs),
   };
 }
