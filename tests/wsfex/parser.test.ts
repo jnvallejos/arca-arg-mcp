@@ -13,6 +13,10 @@ const FIXTURES = join(process.cwd(), 'tests/fixtures');
 const success = readFileSync(join(FIXTURES, 'wsfex-authorize-success.xml'), 'utf-8');
 const rejected = readFileSync(join(FIXTURES, 'wsfex-authorize-rejected.xml'), 'utf-8');
 const errorValid = readFileSync(join(FIXTURES, 'wsfex-authorize-error-validacion.xml'), 'utf-8');
+const structuralError = readFileSync(
+  join(FIXTURES, 'wsfex-authorize-structural-error.xml'),
+  'utf-8',
+);
 const getCmpFound = readFileSync(join(FIXTURES, 'wsfex-getcmp-found.xml'), 'utf-8');
 const getCmpNotFound = readFileSync(join(FIXTURES, 'wsfex-getcmp-not-found.xml'), 'utf-8');
 const getLast = readFileSync(join(FIXTURES, 'wsfex-getlastcmp.xml'), 'utf-8');
@@ -66,7 +70,20 @@ describe('parseFexAuthorizeResponse', () => {
     expect(() => parseFexAuthorizeResponse('<not valid')).toThrow(WsfexError);
   });
 
-  it('throws WsfexError when the response lacks FEXResultAuth', () => {
+  it('returns rechazado when FEXResultAuth is missing but FEXErr is populated', () => {
+    const r = parseFexAuthorizeResponse(structuralError);
+    expect(r.status).toBe('rechazado');
+    if (r.status !== 'rechazado') return;
+    expect(r.numeroComprobante).toBe(0);
+    expect(r.tipoComprobante).toBe(19);
+    expect(r.puntoVenta).toBe(0);
+    expect(r.errores).toHaveLength(1);
+    expect(r.errores[0].code).toBe(1550);
+    expect(r.errores[0].message).toContain('Permiso_existente');
+    expect(r.observaciones).toEqual([]);
+  });
+
+  it('still throws when neither FEXResultAuth nor FEXErr is present', () => {
     const xml =
       '<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
       '<soap:Body><FEXAuthorizeResponse><FEXAuthorizeResult></FEXAuthorizeResult>' +

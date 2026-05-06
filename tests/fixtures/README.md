@@ -140,6 +140,16 @@ rejection and must NOT throw.
 covering codes `607` (cotización mismatch) and `650` (idioma inválido).
 Exercises the parser's multi-error pathway.
 
+## `wsfex-authorize-structural-error.xml`
+
+`FEXAuthorizeResponse` mirroring the shape ARCA returns when it rejects a
+request before assigning a comprobante number: `FEXAuthorizeResult` contains
+no `FEXResultAuth`, only a populated `FEXErr` block (here code `1550`,
+`Permiso_existente` schema validation). Drives the parser branch that
+surfaces this structural rejection as a `ComprobanteExportacionRechazado`
+with the cabecera fields zeroed out, so the user sees the error message
+instead of an opaque exception.
+
 ## `wsfex-getcmp-found.xml`
 
 `FEXGetCMPResponse` containing a `FEXResultGet` block with the full detalle

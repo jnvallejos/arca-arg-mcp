@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <FEXAuthorizeResponse xmlns="http://ar.gov.afip.dif.fexv1/">
+      <FEXAuthorizeResult>
+        <FEXErr>
+          <ErrCode>1550</ErrCode>
+          <ErrMsg>Campo Permiso_existente:'N'. Debe ser 'vacio' para comprobantes 20 o 21 y Tipo_expo=2 o 4</ErrMsg>
+        </FEXErr>
+        <FEXEvents>
+          <EventCode>0</EventCode>
+          <EventMsg>Ok</EventMsg>
+        </FEXEvents>
+      </FEXAuthorizeResult>
+    </FEXAuthorizeResponse>
+  </soap:Body>
+</soap:Envelope>
