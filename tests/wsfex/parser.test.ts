@@ -157,3 +157,82 @@ describe('parseFexGetParamCtzResponse', () => {
     expect(() => parseFexGetParamCtzResponse(xml)).toThrow(WsfexError);
   });
 });
+
+describe('parser fallback branches', () => {
+  it('Motivos_Obs without a "NNN: msg" prefix is preserved as code=0', () => {
+    const xml = rejected.replace(
+      '<Motivos_Obs>00500: El número de comprobante no es el siguiente esperado.</Motivos_Obs>',
+      '<Motivos_Obs>Free-form motivo without numeric prefix</Motivos_Obs>',
+    );
+    const r = parseFexAuthorizeResponse(xml);
+    expect(r.status).toBe('rechazado');
+    if (r.status !== 'rechazado') return;
+    expect(r.observaciones).toEqual([
+      { code: 0, message: 'Free-form motivo without numeric prefix' },
+    ]);
+  });
+
+  it('empty Motivos_Obs yields no observaciones', () => {
+    const xml = rejected.replace(
+      '<Motivos_Obs>00500: El número de comprobante no es el siguiente esperado.</Motivos_Obs>',
+      '<Motivos_Obs></Motivos_Obs>',
+    );
+    const r = parseFexAuthorizeResponse(xml);
+    if (r.status !== 'rechazado') return;
+    expect(r.observaciones).toEqual([]);
+  });
+
+  it('GetCmp with non-numeric Cbte_nro falls back to 0', () => {
+    const xml = getCmpFound.replace('<Cbte_nro>123</Cbte_nro>', '<Cbte_nro>not-a-number</Cbte_nro>');
+    const r = parseFexGetCmpResponse(xml);
+    expect(r.numeroComprobante).toBe(0);
+  });
+
+  it('GetCmp with non-numeric Imp_total falls back to 0', () => {
+    const xml = getCmpFound.replace('<Imp_total>100.00</Imp_total>', '<Imp_total>NaN</Imp_total>');
+    const r = parseFexGetCmpResponse(xml);
+    expect(r.importeTotal).toBe(0);
+  });
+
+  it('GetCmp without Items section yields an empty items array', () => {
+    const xml = getCmpFound.replace(/<Items>[\s\S]*<\/Items>/, '');
+    const r = parseFexGetCmpResponse(xml);
+    expect(r.items).toEqual([]);
+  });
+
+  it('GetCmp with an item that has non-numeric Pro_qty falls back to 0', () => {
+    const xml = getCmpFound.replace('<Pro_qty>1</Pro_qty>', '<Pro_qty>abc</Pro_qty>');
+    const r = parseFexGetCmpResponse(xml);
+    expect(r.items[0].cantidad).toBe(0);
+  });
+
+  it('GetCmp with empty Id_impositivo yields undefined idImpositivoExterior', () => {
+    const xml = getCmpFound.replace(
+      '<Id_impositivo>TEST-EIN-12345</Id_impositivo>',
+      '<Id_impositivo></Id_impositivo>',
+    );
+    const r = parseFexGetCmpResponse(xml);
+    expect(r.cliente.idImpositivoExterior).toBeUndefined();
+  });
+
+  it('GetCmp NOT_FOUND when no FEXResultGet and no errors at all', () => {
+    const xml =
+      '<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
+      '<soap:Body><FEXGetCMPResponse><FEXGetCMPResult></FEXGetCMPResult>' +
+      '</FEXGetCMPResponse></soap:Body></soap:Envelope>';
+    expect(() => parseFexGetCmpResponse(xml)).toThrow(WsfexError);
+  });
+
+  it('GetLastCmp with empty Cbte_nro tag falls back to 0', () => {
+    const xml = getLast.replace('<Cbte_nro>122</Cbte_nro>', '<Cbte_nro></Cbte_nro>');
+    const r = parseFexGetLastCmpResponse(xml);
+    expect(r.numero).toBe(0);
+  });
+
+  it('FEXAuthorize without Fecha_cbte tag yields empty fechaComprobante', () => {
+    const xml = success.replace(/<Fecha_cbte>\d+<\/Fecha_cbte>/, '<Fecha_cbte></Fecha_cbte>');
+    const r = parseFexAuthorizeResponse(xml);
+    if (r.status !== 'aprobado') return;
+    expect(r.fechaComprobante).toBe('');
+  });
+});
