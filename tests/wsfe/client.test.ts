@@ -144,6 +144,19 @@ describe('feCaeSolicitar', () => {
     expect(r.status).toBe('aprobado');
   });
 
+  it('stamps importeTotal from the request onto a successful result', async () => {
+    // FECAESolicitarResponse does not echo ImpTotal, so the client must read
+    // it from the original request and stamp it into the aprobado result.
+    fecaeSolicitarMock.mockResolvedValue([{}, successXml]);
+    const { feCaeSolicitar } = await import('../../src/wsfe/client.js');
+    const req = makeRequest();
+    req.FeDetReq.FECAEDetRequest[0].ImpTotal = 12345.67;
+    const r = await feCaeSolicitar(req, makeConfig());
+    expect(r.status).toBe('aprobado');
+    if (r.status !== 'aprobado') return;
+    expect(r.importeTotal).toBe(12345.67);
+  });
+
   it('parses RECHAZADO responses without throwing', async () => {
     fecaeSolicitarMock.mockResolvedValue([{}, rejectedXml]);
     const { feCaeSolicitar } = await import('../../src/wsfe/client.js');
