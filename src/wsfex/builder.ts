@@ -35,9 +35,7 @@ export function buildFexAuthorizeRequest(
     Punto_vta: input.puntoVenta,
     Cbte_nro: numeroComprobante,
     Tipo_expo: input.concepto,
-    ...(input.concepto === 1
-      ? { Permiso_existente: 'N' as const, Permisos: { Permiso: [] } }
-      : {}),
+    ...(input.concepto === 1 ? { Permiso_existente: 'N' as const, Permisos: { Permiso: [] } } : {}),
     Dst_cmp: input.destinoPais,
     Cliente: input.cliente.nombre,
     Cuit_pais_cliente: 0,

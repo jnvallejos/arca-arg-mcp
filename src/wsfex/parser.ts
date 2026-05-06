@@ -265,10 +265,7 @@ interface RawCtzResult {
  * echo `Mon_id`, so the caller passes the requested `monedaId` and the parser
  * stamps it onto the result.
  */
-export function parseFexGetParamCtzResponse(
-  xml: string,
-  monedaId: CodigoMoneda,
-): CotizacionMoneda {
+export function parseFexGetParamCtzResponse(xml: string, monedaId: CodigoMoneda): CotizacionMoneda {
   const root = parseRoot(xml);
   const result = findResult<RawCtzResult>(root, 'FEXGetPARAM_CtzResult');
   if (!result || !result.FEXResultGet) {
