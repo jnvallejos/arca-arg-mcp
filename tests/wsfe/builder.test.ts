@@ -11,6 +11,7 @@ function baseFacturaB(overrides: Partial<EmitirFacturaInput> = {}): EmitirFactur
     concepto: 1,
     tipoDocReceptor: 99,
     numeroDocReceptor: '0',
+    condicionIvaReceptor: 5,
     fechaComprobante: '2026-04-15',
     importeNeto: 100,
     iva: [{ alicuota: '21', baseImponible: 100, importe: 21 }],
@@ -26,6 +27,7 @@ function baseFacturaA(overrides: Partial<EmitirFacturaInput> = {}): EmitirFactur
     concepto: 1,
     tipoDocReceptor: 80,
     numeroDocReceptor: '30711111119',
+    condicionIvaReceptor: 1,
     fechaComprobante: '2026-04-15',
     importeNeto: 1000,
     iva: [{ alicuota: '21', baseImponible: 1000, importe: 210 }],
@@ -41,6 +43,7 @@ function baseFacturaC(overrides: Partial<EmitirFacturaInput> = {}): EmitirFactur
     concepto: 1,
     tipoDocReceptor: 99,
     numeroDocReceptor: '0',
+    condicionIvaReceptor: 5,
     fechaComprobante: '2026-04-15',
     importeNeto: 100,
     importeTotal: 100,
@@ -247,5 +250,15 @@ describe('buildFeCaeRequest', () => {
   it('produces a single FECAEDetRequest entry (CantReg=1)', () => {
     const r = buildFeCaeRequest(baseFacturaB(), AUTH_CUIT, 1);
     expect(r.FeDetReq.FECAEDetRequest).toHaveLength(1);
+  });
+
+  it('propagates condicionIvaReceptor as CondicionIVAReceptorId', () => {
+    const r = buildFeCaeRequest(baseFacturaB({ condicionIvaReceptor: 5 }), AUTH_CUIT, 1);
+    expect(r.FeDetReq.FECAEDetRequest[0].CondicionIVAReceptorId).toBe(5);
+  });
+
+  it('forwards a different condicionIvaReceptor value (e.g. 1=Responsable Inscripto)', () => {
+    const r = buildFeCaeRequest(baseFacturaA({ condicionIvaReceptor: 1 }), AUTH_CUIT, 1);
+    expect(r.FeDetReq.FECAEDetRequest[0].CondicionIVAReceptorId).toBe(1);
   });
 });
