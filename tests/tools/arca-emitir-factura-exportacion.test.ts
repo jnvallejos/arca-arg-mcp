@@ -54,6 +54,7 @@ function baseInput(
       },
     ],
     importeTotal: 100,
+    fechaPago: '2026-04-15',
     ...overrides,
   };
 }
@@ -334,5 +335,69 @@ describe('arca_emitir_factura_exportacion tool', () => {
         importeTotal: -100,
       }),
     ).rejects.toThrow();
+  });
+
+  it('rejects request when concepto=2 has no fechaPago', async () => {
+    const { handleArcaEmitirFacturaExportacion } = await import(
+      '../../src/tools/arca-emitir-factura-exportacion.js'
+    );
+    const input = baseInput({ concepto: 2 });
+    delete (input as Partial<EmitirFacturaExportacionInput>).fechaPago;
+    await expect(handleArcaEmitirFacturaExportacion(makeConfig(), input)).rejects.toThrow(
+      /fechaPago/,
+    );
+    expect(fexAuthorizeMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects request when concepto=4 has no fechaPago', async () => {
+    const { handleArcaEmitirFacturaExportacion } = await import(
+      '../../src/tools/arca-emitir-factura-exportacion.js'
+    );
+    const input = baseInput({ concepto: 4 });
+    delete (input as Partial<EmitirFacturaExportacionInput>).fechaPago;
+    await expect(handleArcaEmitirFacturaExportacion(makeConfig(), input)).rejects.toThrow(
+      /fechaPago/,
+    );
+    expect(fexAuthorizeMock).not.toHaveBeenCalled();
+  });
+
+  it('accepts request when concepto=1 has no fechaPago', async () => {
+    fexGetLastCmpMock.mockResolvedValue(ultimo(122));
+    fexAuthorizeMock.mockResolvedValue(aprobado());
+    const { handleArcaEmitirFacturaExportacion } = await import(
+      '../../src/tools/arca-emitir-factura-exportacion.js'
+    );
+    const input = baseInput({ concepto: 1 });
+    delete (input as Partial<EmitirFacturaExportacionInput>).fechaPago;
+    await expect(handleArcaEmitirFacturaExportacion(makeConfig(), input)).resolves.toBeDefined();
+  });
+
+  it('rejects request when fechaPago is before fechaComprobante', async () => {
+    const { handleArcaEmitirFacturaExportacion } = await import(
+      '../../src/tools/arca-emitir-factura-exportacion.js'
+    );
+    await expect(
+      handleArcaEmitirFacturaExportacion(makeConfig(), {
+        ...baseInput(),
+        fechaComprobante: '2026-04-15',
+        fechaPago: '2026-04-14',
+      }),
+    ).rejects.toThrow(/fechaPago/);
+    expect(fexAuthorizeMock).not.toHaveBeenCalled();
+  });
+
+  it('accepts request when fechaPago equals fechaComprobante', async () => {
+    fexGetLastCmpMock.mockResolvedValue(ultimo(122));
+    fexAuthorizeMock.mockResolvedValue(aprobado());
+    const { handleArcaEmitirFacturaExportacion } = await import(
+      '../../src/tools/arca-emitir-factura-exportacion.js'
+    );
+    await expect(
+      handleArcaEmitirFacturaExportacion(makeConfig(), {
+        ...baseInput(),
+        fechaComprobante: '2026-04-15',
+        fechaPago: '2026-04-15',
+      }),
+    ).resolves.toBeDefined();
   });
 });
