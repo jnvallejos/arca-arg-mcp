@@ -8,9 +8,7 @@
 
 MCP (Model Context Protocol) server for Argentine tax compliance. Exposes ARCA (ex-AFIP) web services as tools usable from Claude Desktop, Claude Code, and any MCP-compatible client.
 
-> **Status: in development.** This repo is being built phase by phase.
-
-## What it will do
+## What it does
 
 - Authenticate with ARCA via WSAA (certificate-based)
 - Validate CUITs against the Padrón web service
@@ -225,7 +223,7 @@ that's confirmed by ARCA itself when the first authentication call succeeds.
 
 ## Running the smoke tests
 
-There are two smoke scripts, runnable individually or as a chained pair:
+There are four smoke scripts, runnable individually or chained together:
 
 - `npm run smoke:wsaa` — exercises the full WSAA flow against ARCA homologation:
   build TRA, sign with PKCS#7 / CMS, call `loginCms`, parse the TA, and write it
@@ -271,9 +269,10 @@ up). To look up a different CUIT, set `SMOKE_CUIT`:
 SMOKE_CUIT=30711111119 npm run smoke:padron
 ```
 
-Both scripts redact sensitive data: `smoke:wsaa` prints token / sign lengths
-only; `smoke:padron` prints field lengths and counts only — never names,
-addresses, or activity descriptions.
+The smoke scripts redact sensitive data: `smoke:wsaa` prints token / sign
+lengths only; `smoke:padron` prints field lengths and counts only — never
+names, addresses, or activity descriptions; `smoke:wsfe` and `smoke:wsfex`
+print the CAE length only, never the CAE itself.
 
 ### Common failures
 
@@ -311,9 +310,7 @@ equivalent path on Linux/Windows):
 }
 ```
 
-Restart Claude Desktop. The available tools (`ping`, `arca_status`,
-`arca_consultar_cuit`, plus whatever future phases add) will appear in the
-chat UI.
+Restart Claude Desktop. The available tools will appear in the chat UI.
 
 ### Tools available
 
