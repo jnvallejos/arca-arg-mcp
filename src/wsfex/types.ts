@@ -198,8 +198,8 @@ export interface FexCmp {
   Incoterms?: string;
   Incoterms_Ds?: string;
   Permisos?: { Permiso: never[] };
-  Cmps_asoc: { Cmp_asoc: never[] };
-  Opcionales: { Opcional: never[] };
+  Cmps_asoc?: { Cmp_asoc: never[] };
+  Opcionales?: { Opcional: never[] };
   Items: { Item: FexItem[] };
   Fecha_pago?: string;
   Observaciones?: string;

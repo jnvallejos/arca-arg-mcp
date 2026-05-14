@@ -10,15 +10,14 @@ import type {
  * Builds the WSFEX `FEXAuthorize` request payload from a validated tool input
  * plus an explicit comprobante number (resolved by the tool layer).
  *
- * Pure function. Forces project invariants: `Cuit_pais_cliente=0`, empty
- * `Cmps_asoc`/`Opcionales` arrays (CmpAsoc / Opcionales are deferred to V2).
- * When `concepto` is 1 (goods), `Permiso_existente='N'` is sent. When
- * `concepto` is 2 (services) or 4 (other), `Permiso_existente=''` is sent
- * (tag present, value empty). The `Permisos` collection is omitted for all
- * conceptos in V1 since PERMISO_EMBARQUE is deferred to V2. This matches
- * ARCA error 1550 ("Debe ser S, N o vacio, debe enviarse tag") for services.
- * Numeric importes are rounded defensively to 2 decimals; `Pro_qty` keeps up
- * to 6 decimals so fractional-hour services round-trip cleanly.
+ * Pure function. Forces project invariants: `Cuit_pais_cliente=0`. When
+ * `concepto` is 1 (goods), `Permiso_existente='N'` is sent. When `concepto`
+ * is 2 (services) or 4 (other), `Permiso_existente=''` is sent (tag present,
+ * value empty). The `Permisos`, `Cmps_asoc`, and `Opcionales` collections
+ * are all omitted entirely in V1; sending them as empty tags triggers ARCA
+ * errors 1736/1820 (CmpAsoc and Opcionales are deferred to V2). Numeric
+ * importes are rounded defensively to 2 decimals; `Pro_qty` keeps up to 6
+ * decimals so fractional-hour services round-trip cleanly.
  *
  * The `authenticatedCuit` parameter is kept in the signature so the SOAP
  * client can pass it as part of the `Auth` envelope; it is not stamped into
@@ -45,8 +44,6 @@ export function buildFexAuthorizeRequest(
     Moneda_ctz: input.cotizacion,
     Imp_total: round2(input.importeTotal),
     Idioma_cbte: input.idiomaComprobante,
-    Cmps_asoc: { Cmp_asoc: [] },
-    Opcionales: { Opcional: [] },
     Items: { Item: input.items.map(toFexItem) },
   };
 
