@@ -76,8 +76,7 @@ const inputSchema = z
     if (input.fechaPago && input.fechaPago < input.fechaComprobante) {
       ctx.addIssue({
         code: 'custom',
-        message:
-          'fechaPago debe ser igual o posterior a fechaComprobante (validación ARCA 1674).',
+        message: 'fechaPago debe ser igual o posterior a fechaComprobante (validación ARCA 1674).',
         path: ['fechaPago'],
       });
     }

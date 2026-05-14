@@ -342,7 +342,7 @@ describe('arca_emitir_factura_exportacion tool', () => {
       '../../src/tools/arca-emitir-factura-exportacion.js'
     );
     const input = baseInput({ concepto: 2 });
-    delete (input as Partial<EmitirFacturaExportacionInput>).fechaPago;
+    (input as Partial<EmitirFacturaExportacionInput>).fechaPago = undefined;
     await expect(handleArcaEmitirFacturaExportacion(makeConfig(), input)).rejects.toThrow(
       /fechaPago/,
     );
@@ -354,7 +354,7 @@ describe('arca_emitir_factura_exportacion tool', () => {
       '../../src/tools/arca-emitir-factura-exportacion.js'
     );
     const input = baseInput({ concepto: 4 });
-    delete (input as Partial<EmitirFacturaExportacionInput>).fechaPago;
+    (input as Partial<EmitirFacturaExportacionInput>).fechaPago = undefined;
     await expect(handleArcaEmitirFacturaExportacion(makeConfig(), input)).rejects.toThrow(
       /fechaPago/,
     );
@@ -368,7 +368,7 @@ describe('arca_emitir_factura_exportacion tool', () => {
       '../../src/tools/arca-emitir-factura-exportacion.js'
     );
     const input = baseInput({ concepto: 1 });
-    delete (input as Partial<EmitirFacturaExportacionInput>).fechaPago;
+    (input as Partial<EmitirFacturaExportacionInput>).fechaPago = undefined;
     await expect(handleArcaEmitirFacturaExportacion(makeConfig(), input)).resolves.toBeDefined();
   });
 
