@@ -63,6 +63,24 @@ const inputSchema = z
         message: `importeTotal (${input.importeTotal}) does not match the sum of items[].importeTotal (${sum.toFixed(2)}).`,
       });
     }
+
+    if ((input.concepto === 2 || input.concepto === 4) && !input.fechaPago) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'Fecha de pago (fechaPago) es obligatoria para concepto 2 (Servicios) y 4 (Otros) según WSFEX.',
+        path: ['fechaPago'],
+      });
+    }
+
+    if (input.fechaPago && input.fechaPago < input.fechaComprobante) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'fechaPago debe ser igual o posterior a fechaComprobante (validación ARCA 1674).',
+        path: ['fechaPago'],
+      });
+    }
   });
 
 export const arcaEmitirFacturaExportacionTool: Tool = {
