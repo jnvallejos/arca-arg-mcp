@@ -30,6 +30,48 @@ the hard way. This project wraps them as MCP tools so an LLM (or any MCP client)
 drive them with a clean, typed interface, instead of every team rebuilding the same
 auth and signing layer from scratch.
 
+## Architecture
+
+Three layers: the MCP client talks to this server over stdio; the server holds a
+WSAA-issued ticket and uses it to drive the four ARCA SOAP services.
+
+```mermaid
+flowchart LR
+    subgraph Client["MCP Client (Claude Desktop / Claude Code)"]
+        LLM[LLM]
+    end
+
+    subgraph Server["arca-arg-mcp Server (stdio)"]
+        Tools[MCP Tools<br/>arca_emitir_factura<br/>arca_consultar_cuit<br/>...]
+        WSAA[WSAA Auth<br/>TA Cache]
+        WSFE[WSFE Client]
+        WSFEX[WSFEX Client]
+        Padron[Padrón Client]
+    end
+
+    subgraph ARCA["ARCA / ex-AFIP (SOAP)"]
+        WSAAEndpoint[WSAA Endpoint]
+        WSFEEndpoint[WSFE Endpoint]
+        WSFEXEndpoint[WSFEX Endpoint]
+        PadronEndpoint[Padrón A13 Endpoint]
+    end
+
+    LLM -->|tool call| Tools
+    Tools --> WSAA
+    Tools --> WSFE
+    Tools --> WSFEX
+    Tools --> Padron
+    WSAA -->|certificate auth| WSAAEndpoint
+    WSAA -.->|cached TA| Tools
+    WSFE -->|SOAP + TA| WSFEEndpoint
+    WSFEX -->|SOAP + TA| WSFEXEndpoint
+    Padron -->|SOAP + TA| PadronEndpoint
+```
+
+The dotted arrow from WSAA back to Tools represents the cached ticket
+(`ta-<cuit>-<service>.json`) being reused on subsequent calls within its
+~12-hour validity window.
+
 ## Prerequisites
 
 - **Node.js 20** or higher
