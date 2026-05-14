@@ -1,5 +1,9 @@
 # arca-arg-mcp
 
+🇪🇸 [Leer en español](README.es.md)
+
+![Demo: emitting a Factura B via Claude Desktop](docs/demo.gif)
+
 [![CI](https://github.com/jnvallejos/arca-arg-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/jnvallejos/arca-arg-mcp/actions/workflows/ci.yml)
 
 MCP (Model Context Protocol) server for Argentine tax compliance. Exposes ARCA (ex-AFIP) web services as tools usable from Claude Desktop, Claude Code, and any MCP-compatible client.
