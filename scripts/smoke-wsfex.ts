@@ -77,11 +77,12 @@ async function main(): Promise<void> {
   const next = ultimo.numero + 1;
   log(`Last number: ${ultimo.numero}. Next will be ${next}.`);
 
+  const today = todayIsoDate();
   const input: EmitirFacturaExportacionInput = {
     tipoComprobante: 19,
     puntoVenta,
     concepto: 2,
-    fechaComprobante: todayIsoDate(),
+    fechaComprobante: today,
     destinoPais: 200,
     cliente: {
       nombre: 'TEST CLIENT INC',
@@ -102,6 +103,7 @@ async function main(): Promise<void> {
       },
     ],
     importeTotal: 100,
+    fechaPago: today,
   };
 
   log('Emitting test Factura E (DOL 100 to TEST CLIENT INC, ESTADOS UNIDOS)...');
