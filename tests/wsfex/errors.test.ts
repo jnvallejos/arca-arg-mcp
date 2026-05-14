@@ -55,6 +55,27 @@ describe('describeWsfexError', () => {
     expect(out).toContain('fechaComprobante');
     expect(out).toContain('💡');
   });
+
+  it('appends a hint for code 1550 mentioning Permiso_existente', () => {
+    const out = describeWsfexError(1550, 'permiso requerido');
+    expect(out).toContain('permiso requerido');
+    expect(out).toContain('Permiso_existente');
+    expect(out).toContain('💡');
+  });
+
+  it('appends a hint for code 1736 mentioning Tipo_expo 2 and 4', () => {
+    const out = describeWsfexError(1736, 'permiso no permitido');
+    expect(out).toContain('permiso no permitido');
+    expect(out).toContain('Tipo_expo');
+    expect(out).toContain('💡');
+  });
+
+  it('appends a hint for code 1820 mentioning Cmps_asoc collection', () => {
+    const out = describeWsfexError(1820, 'coleccion vacia');
+    expect(out).toContain('coleccion vacia');
+    expect(out).toContain('Cmps_asoc');
+    expect(out).toContain('💡');
+  });
 });
 
 describe('WSFEX_ERROR_HINTS table', () => {
@@ -64,9 +85,12 @@ describe('WSFEX_ERROR_HINTS table', () => {
     expect(WSFEX_ERROR_HINTS[608]).toBeDefined();
     expect(WSFEX_ERROR_HINTS[609]).toBeDefined();
     expect(WSFEX_ERROR_HINTS[650]).toBeDefined();
+    expect(WSFEX_ERROR_HINTS[1550]).toBeDefined();
     expect(WSFEX_ERROR_HINTS[1671]).toBeDefined();
     expect(WSFEX_ERROR_HINTS[1672]).toBeDefined();
     expect(WSFEX_ERROR_HINTS[1674]).toBeDefined();
+    expect(WSFEX_ERROR_HINTS[1736]).toBeDefined();
+    expect(WSFEX_ERROR_HINTS[1820]).toBeDefined();
   });
 
   it('hint for 607 mentions the cotización tool', () => {
