@@ -185,7 +185,7 @@ export interface FexCmp {
   Punto_vta: number;
   Cbte_nro: number;
   Tipo_expo: number;
-  Permiso_existente?: 'N';
+  Permiso_existente: 'N' | '';
   Dst_cmp: number;
   Cliente: string;
   Cuit_pais_cliente: 0;
