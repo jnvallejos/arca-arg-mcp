@@ -57,24 +57,29 @@ describe('buildFexAuthorizeRequest', () => {
     expect(r.Cmp.Fecha_cbte).toBe('20260415');
   });
 
-  it('includes Permiso_existente=N and empty Permisos for concepto=1 (Productos)', () => {
+  it('sets Permiso_existente to N for concepto=1 (Productos)', () => {
     const r = buildFexAuthorizeRequest(baseInput({ concepto: 1 }), AUTH_CUIT, 1);
     expect('Permiso_existente' in r.Cmp).toBe(true);
     expect(r.Cmp.Permiso_existente).toBe('N');
-    expect('Permisos' in r.Cmp).toBe(true);
-    expect(r.Cmp.Permisos).toEqual({ Permiso: [] });
   });
 
-  it('omits Permiso_existente and Permisos for concepto=2 (Servicios)', () => {
+  it('sets Permiso_existente to empty string for concepto=2 (Servicios)', () => {
     const r = buildFexAuthorizeRequest(baseInput({ concepto: 2 }), AUTH_CUIT, 1);
-    expect('Permiso_existente' in r.Cmp).toBe(false);
-    expect('Permisos' in r.Cmp).toBe(false);
+    expect('Permiso_existente' in r.Cmp).toBe(true);
+    expect(r.Cmp.Permiso_existente).toBe('');
   });
 
-  it('omits Permiso_existente and Permisos for concepto=4 (Otros)', () => {
+  it('sets Permiso_existente to empty string for concepto=4 (Otros)', () => {
     const r = buildFexAuthorizeRequest(baseInput({ concepto: 4 }), AUTH_CUIT, 1);
-    expect('Permiso_existente' in r.Cmp).toBe(false);
-    expect('Permisos' in r.Cmp).toBe(false);
+    expect('Permiso_existente' in r.Cmp).toBe(true);
+    expect(r.Cmp.Permiso_existente).toBe('');
+  });
+
+  it('omits Permisos for all conceptos in V1', () => {
+    for (const concepto of [1, 2, 4] as const) {
+      const r = buildFexAuthorizeRequest(baseInput({ concepto }), AUTH_CUIT, 1);
+      expect('Permisos' in r.Cmp).toBe(false);
+    }
   });
 
   it('forces Cmps_asoc to be an empty Cmp_asoc array (no comprobantes asociados in V1)', () => {
