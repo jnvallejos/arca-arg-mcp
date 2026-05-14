@@ -8,7 +8,8 @@
     "arca-arg-mcp": "dist/index.js"
   },
   "files": [
-    "dist",
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
     "README.md",
     "README.es.md",
     "LICENSE",
