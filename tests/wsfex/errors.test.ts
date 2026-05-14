@@ -31,6 +31,30 @@ describe('describeWsfexError', () => {
     expect(a).toContain('arca_obtener_ultimo_comprobante_exportacion');
     expect(b).toContain('arca_obtener_cotizacion_moneda');
   });
+
+  it('appends a hint for code 1671 mentioning the YYYY-MM-DD format', () => {
+    const out = describeWsfexError(1671, 'formato invalido');
+    expect(out).toContain('formato invalido');
+    expect(out).toContain('YYYY-MM-DD');
+    expect(out).toContain('💡');
+  });
+
+  it('appends a hint for code 1672 mentioning concepto 2 and 4', () => {
+    const out = describeWsfexError(1672, 'fecha_pago requerida');
+    expect(out).toContain('fecha_pago requerida');
+    expect(out).toContain('fechaPago');
+    expect(out).toMatch(/2.*Servicios/);
+    expect(out).toMatch(/4.*Otros/);
+    expect(out).toContain('💡');
+  });
+
+  it('appends a hint for code 1674 mentioning fechaComprobante ordering', () => {
+    const out = describeWsfexError(1674, 'fecha de pago anterior');
+    expect(out).toContain('fecha de pago anterior');
+    expect(out).toContain('fechaPago');
+    expect(out).toContain('fechaComprobante');
+    expect(out).toContain('💡');
+  });
 });
 
 describe('WSFEX_ERROR_HINTS table', () => {
@@ -40,6 +64,9 @@ describe('WSFEX_ERROR_HINTS table', () => {
     expect(WSFEX_ERROR_HINTS[608]).toBeDefined();
     expect(WSFEX_ERROR_HINTS[609]).toBeDefined();
     expect(WSFEX_ERROR_HINTS[650]).toBeDefined();
+    expect(WSFEX_ERROR_HINTS[1671]).toBeDefined();
+    expect(WSFEX_ERROR_HINTS[1672]).toBeDefined();
+    expect(WSFEX_ERROR_HINTS[1674]).toBeDefined();
   });
 
   it('hint for 607 mentions the cotización tool', () => {
