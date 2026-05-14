@@ -71,3 +71,23 @@ export class WsfeError extends ArcaError {
     this.code = code;
   }
 }
+
+export type WsfexErrorCode = 'NOT_FOUND' | 'AUTH_FAILED' | 'SERVICE_UNAVAILABLE' | 'UNKNOWN';
+
+/**
+ * Thrown when the WSFEX service rejects a request at the protocol level
+ * (network error, auth failure, malformed response) or when a `FEXGetCMP`
+ * lookup cannot find the requested comprobante. Business rejections returned
+ * by ARCA (`Resultado='R'`) are NOT modeled as errors — they surface as a
+ * `ComprobanteExportacionRechazado` discriminated-union variant from the
+ * parser, mirroring the `WsfeError` design.
+ */
+export class WsfexError extends ArcaError {
+  public readonly code: WsfexErrorCode;
+
+  constructor(code: WsfexErrorCode, message: string) {
+    super(message);
+    this.name = 'WsfexError';
+    this.code = code;
+  }
+}

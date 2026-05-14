@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <FEXAuthorizeResponse xmlns="http://ar.gov.afip.dif.fexv1/">
+      <FEXAuthorizeResult>
+        <FEXResultAuth>
+          <Cuit>20239312345</Cuit>
+          <Cbte_Tipo>19</Cbte_Tipo>
+          <Punto_vta>1</Punto_vta>
+          <Cbte_nro>124</Cbte_nro>
+          <Fecha_cbte>20260415</Fecha_cbte>
+          <Resultado>R</Resultado>
+          <Motivos_Obs>00500: El número de comprobante no es el siguiente esperado.</Motivos_Obs>
+          <Reproceso>N</Reproceso>
+          <Cae></Cae>
+          <Fch_venc_Cae></Fch_venc_Cae>
+        </FEXResultAuth>
+        <FEXErr>
+          <ErrCode>500</ErrCode>
+          <ErrMsg>El número de comprobante no es el siguiente esperado.</ErrMsg>
+        </FEXErr>
+      </FEXAuthorizeResult>
+    </FEXAuthorizeResponse>
+  </soap:Body>
+</soap:Envelope>

@@ -9,11 +9,27 @@ import {
   handleArcaConsultarComprobante,
 } from './tools/arca-consultar-comprobante.js';
 import { arcaConsultarCuitTool, handleArcaConsultarCuit } from './tools/arca-consultar-cuit.js';
+import {
+  arcaConsultarFacturaExportacionTool,
+  handleArcaConsultarFacturaExportacion,
+} from './tools/arca-consultar-factura-exportacion.js';
+import {
+  arcaEmitirFacturaExportacionTool,
+  handleArcaEmitirFacturaExportacion,
+} from './tools/arca-emitir-factura-exportacion.js';
 import { arcaEmitirFacturaTool, handleArcaEmitirFactura } from './tools/arca-emitir-factura.js';
 import {
   arcaListarTiposComprobanteTool,
   handleArcaListarTiposComprobante,
 } from './tools/arca-listar-tipos-comprobante.js';
+import {
+  arcaObtenerCotizacionMonedaTool,
+  handleArcaObtenerCotizacionMoneda,
+} from './tools/arca-obtener-cotizacion-moneda.js';
+import {
+  arcaObtenerUltimoComprobanteExportacionTool,
+  handleArcaObtenerUltimoComprobanteExportacion,
+} from './tools/arca-obtener-ultimo-comprobante-exportacion.js';
 import {
   arcaObtenerUltimoComprobanteTool,
   handleArcaObtenerUltimoComprobante,
@@ -46,6 +62,10 @@ export function createServer(): Server {
       arcaObtenerUltimoComprobanteTool,
       arcaConsultarComprobanteTool,
       arcaListarTiposComprobanteTool,
+      arcaEmitirFacturaExportacionTool,
+      arcaObtenerUltimoComprobanteExportacionTool,
+      arcaConsultarFacturaExportacionTool,
+      arcaObtenerCotizacionMonedaTool,
     ],
   }));
 
@@ -67,6 +87,14 @@ export function createServer(): Server {
         return handleArcaConsultarComprobante(config, args);
       case 'arca_listar_tipos_comprobante':
         return handleArcaListarTiposComprobante(args);
+      case 'arca_emitir_factura_exportacion':
+        return handleArcaEmitirFacturaExportacion(config, args);
+      case 'arca_obtener_ultimo_comprobante_exportacion':
+        return handleArcaObtenerUltimoComprobanteExportacion(config, args);
+      case 'arca_consultar_factura_exportacion':
+        return handleArcaConsultarFacturaExportacion(config, args);
+      case 'arca_obtener_cotizacion_moneda':
+        return handleArcaObtenerCotizacionMoneda(config, args);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }

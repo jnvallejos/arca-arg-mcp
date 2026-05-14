@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <FEXGetPARAM_CtzResponse xmlns="http://ar.gov.afip.dif.fexv1/">
+      <FEXGetPARAM_CtzResult>
+        <FEXResultGet>
+          <Mon_ctz>1180.5</Mon_ctz>
+          <Mon_fecha>20260415</Mon_fecha>
+        </FEXResultGet>
+        <FEXErr>
+          <ErrCode>0</ErrCode>
+          <ErrMsg>OK</ErrMsg>
+        </FEXErr>
+        <FEXEvents>
+          <EventCode>0</EventCode>
+          <EventMsg>Ok</EventMsg>
+        </FEXEvents>
+      </FEXGetPARAM_CtzResult>
+    </FEXGetPARAM_CtzResponse>
+  </soap:Body>
+</soap:Envelope>

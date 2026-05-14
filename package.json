@@ -20,10 +20,11 @@
     "lint": "biome check src tests",
     "lint:fix": "biome check --write src tests",
     "typecheck": "tsc --noEmit",
-    "smoke": "npm run smoke:wsaa && npm run smoke:padron && npm run smoke:wsfe",
+    "smoke": "npm run smoke:wsaa && npm run smoke:padron && npm run smoke:wsfe && npm run smoke:wsfex",
     "smoke:wsaa": "tsx scripts/smoke-wsaa.ts",
     "smoke:padron": "tsx scripts/smoke-padron.ts",
-    "smoke:wsfe": "tsx scripts/smoke-wsfe.ts"
+    "smoke:wsfe": "tsx scripts/smoke-wsfe.ts",
+    "smoke:wsfex": "tsx scripts/smoke-wsfex.ts"
   },
   "keywords": [
     "mcp",
