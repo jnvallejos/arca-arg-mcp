@@ -134,3 +134,29 @@ describe('CAE redaction safety', () => {
     expect(joined).not.toContain(cae);
   });
 });
+
+describe('format invariants', () => {
+  it('indents APROBADO body lines with two spaces and aligns labels to a 30-char column', () => {
+    const lines = formatWsfeSmokeSummary(makeAprobado());
+    for (const line of lines.slice(1)) {
+      expect(line.startsWith('  ')).toBe(true);
+      const body = line.slice(2);
+      const match = body.match(/^([^:]+:\s+)\S/);
+      expect(match, `line "${line}" must have aligned label column`).not.toBeNull();
+      const labelColumn = match?.[1] ?? '';
+      expect(labelColumn.length).toBeGreaterThanOrEqual(30);
+    }
+  });
+
+  it('indents RECHAZADO body lines with two spaces and aligns labels to a 30-char column', () => {
+    const lines = formatWsfeSmokeSummary(makeRechazado());
+    for (const line of lines.slice(1)) {
+      expect(line.startsWith('  ')).toBe(true);
+      const body = line.slice(2);
+      const match = body.match(/^([^:]+:\s+)\S/);
+      expect(match, `line "${line}" must have aligned label column`).not.toBeNull();
+      const labelColumn = match?.[1] ?? '';
+      expect(labelColumn.length).toBeGreaterThanOrEqual(30);
+    }
+  });
+});

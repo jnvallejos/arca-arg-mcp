@@ -5,10 +5,11 @@ import { getValidToken } from '../src/wsaa/auth.js';
 import type { ServiceName, TA } from '../src/wsaa/types.js';
 
 const SMOKE_SERVICE: ServiceName = 'wsfe';
-const LABEL_WIDTH = 16;
+const LABEL_WIDTH = 30;
 
 function pad(label: string): string {
-  return `${label}:`.padEnd(LABEL_WIDTH);
+  const base = `${label}:`.padEnd(LABEL_WIDTH);
+  return base.endsWith(' ') ? base : `${base} `;
 }
 
 function formatRemaining(expirationTime: Date, now: Date): string {
@@ -43,7 +44,7 @@ export function formatTaSummary(ta: TA, cachePath: string, now: Date): string[] 
 
 /* v8 ignore start */
 function log(line: string): void {
-  console.log(`[smoke] ${line}`);
+  console.log(`[smoke-wsaa] ${line}`);
 }
 
 function cacheFilePath(cacheDir: string, cuit: string, service: ServiceName): string {

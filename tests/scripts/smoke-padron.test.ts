@@ -170,4 +170,16 @@ describe('formatPersonaSummary', () => {
     expect(joined).not.toContain('CABA');
     expect(joined).not.toContain('1437');
   });
+
+  it('indents body lines with two spaces and aligns labels to a 30-char column', () => {
+    const lines = formatPersonaSummary(makeFisica());
+    for (const line of lines.slice(1)) {
+      expect(line.startsWith('  ')).toBe(true);
+      const body = line.slice(2);
+      const match = body.match(/^([^:]+:\s+)\S/);
+      expect(match, `line "${line}" must have aligned label column`).not.toBeNull();
+      const labelColumn = match?.[1] ?? '';
+      expect(labelColumn.length).toBeGreaterThanOrEqual(30);
+    }
+  });
 });
