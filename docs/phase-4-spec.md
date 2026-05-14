@@ -125,6 +125,8 @@ WSFEX uses similar concepto codes to WSFE:
 
 Concepts `1` and `2` are the common ones for the freelance audience. `4` is rarely used; supported on input but no special handling.
 
+**Mandatory fields per concepto:** When `concepto` is 2 (Servicios) or 4 (Otros), `fechaPago` is mandatory per ARCA validation 1672 (WSFEX v1.6+, effective 2019-11-01). For concepto 1 (Productos), `fechaPago` is optional. Tool input validation enforces this at the Zod layer.
+
 ### 2.8 IVA
 
 **Not applicable.** Export is IVA-exempt under Argentine tax law. The WSFEX request does not have an IVA section. Tools must reject any IVA in the input.
@@ -240,7 +242,7 @@ export interface EmitirFacturaExportacionInput {
   incotermsDescripcion?: string;
   items: ItemFacturaExportacion[];   // at least 1
   importeTotal: number;          // sum of items.importeTotal
-  fechaPago?: string;            // YYYY-MM-DD; optional
+  fechaPago?: string;            // YYYY-MM-DD. Required when `concepto` is 2 or 4 per ARCA validation 1672. Must be equal or later than `fechaComprobante` per validation 1674.
   observaciones?: string;        // free-form notes
 }
 
@@ -309,7 +311,7 @@ export interface CotizacionMoneda {
 **Decisions:**
 - `cliente` is a nested object so all foreign-client fields stay grouped
 - `items` has its own type because export invoices always itemize (services or goods)
-- `fechaPago` is optional but recommended for services
+- `fechaPago` is mandatory for `concepto` 2 (Servicios) and 4 (Otros) per ARCA validation 1672, and must be ≥ `fechaComprobante` per validation 1674; optional for `concepto` 1 (Productos)
 - Discriminated union `ResultadoEmisionExportacion` mirrors WSFE pattern
 - All field names in input use camelCase; the builder translates to WSFEX's mixed-case (`Cmp_tot`, `Moneda_Id`, `Cliente`, etc.)
 
