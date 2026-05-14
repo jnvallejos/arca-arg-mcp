@@ -82,14 +82,18 @@ describe('buildFexAuthorizeRequest', () => {
     }
   });
 
-  it('forces Cmps_asoc to be an empty Cmp_asoc array (no comprobantes asociados in V1)', () => {
+  it('omits Cmps_asoc and Opcionales in V1 (deferred to V2)', () => {
     const r = buildFexAuthorizeRequest(baseInput(), AUTH_CUIT, 1);
-    expect(r.Cmp.Cmps_asoc).toEqual({ Cmp_asoc: [] });
+    expect('Cmps_asoc' in r.Cmp).toBe(false);
+    expect('Opcionales' in r.Cmp).toBe(false);
   });
 
-  it('forces Opcionales to be an empty Opcional array (no opcionales in V1)', () => {
-    const r = buildFexAuthorizeRequest(baseInput(), AUTH_CUIT, 1);
-    expect(r.Cmp.Opcionales).toEqual({ Opcional: [] });
+  it('omits Cmps_asoc and Opcionales for all conceptos', () => {
+    for (const concepto of [1, 2, 4] as const) {
+      const r = buildFexAuthorizeRequest(baseInput({ concepto }), AUTH_CUIT, 1);
+      expect('Cmps_asoc' in r.Cmp).toBe(false);
+      expect('Opcionales' in r.Cmp).toBe(false);
+    }
   });
 
   it('forces Cuit_pais_cliente=0 (no CUIT for foreign client)', () => {
