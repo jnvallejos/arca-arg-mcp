@@ -1,6 +1,6 @@
 {
   "name": "arca-arg-mcp",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "MCP server for Argentine tax compliance with ARCA (ex-AFIP) web services",
   "type": "module",
   "main": "dist/index.js",
@@ -10,7 +10,9 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "README.es.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsc",
@@ -24,7 +26,8 @@
     "smoke:wsaa": "tsx scripts/smoke-wsaa.ts",
     "smoke:padron": "tsx scripts/smoke-padron.ts",
     "smoke:wsfe": "tsx scripts/smoke-wsfe.ts",
-    "smoke:wsfex": "tsx scripts/smoke-wsfex.ts"
+    "smoke:wsfex": "tsx scripts/smoke-wsfex.ts",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm test && npm run build"
   },
   "keywords": [
     "mcp",
@@ -33,7 +36,13 @@
     "afip",
     "arca",
     "factura-electronica",
-    "claude"
+    "claude",
+    "wsaa",
+    "wsfe",
+    "wsfex",
+    "padron",
+    "factura-electronica-argentina",
+    "monotributo"
   ],
   "author": "Javier Vallejos <https://github.com/jnvallejos>",
   "license": "MIT",
