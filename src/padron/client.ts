@@ -37,7 +37,7 @@ export async function getPersona(cuitToQuery: string, config: ArcaConfig): Promi
   } catch (err) {
     throw new PadronError(
       'SERVICE_UNAVAILABLE',
-      `Could not load Padrón WSDL at ${wsdlUrl}: ${(err as Error).message}`,
+      `No se pudo cargar el WSDL de Padrón en ${wsdlUrl}: ${(err as Error).message}`,
     );
   }
 
@@ -84,27 +84,27 @@ function mapErrorToPadronError(err: SoapErrorLike): PadronError {
   const haystack = `${body}\n${message}`;
 
   if (/no existe persona|la clave \(cuit\/cuil\) consultada es inexistente/i.test(haystack)) {
-    return new PadronError('NOT_FOUND', 'No persona registered with that CUIT in ARCA Padrón.');
+    return new PadronError('NOT_FOUND', 'No se encontró persona con ese CUIT en el Padrón de ARCA.');
   }
   if (isAuthFault(haystack)) {
     return new PadronError(
       'AUTH_FAILED',
-      `Padrón rejected the WSAA token: ${message || 'authentication failure'}`,
+      `El Padrón rechazó el token de WSAA: ${message || 'falla de autenticación'}`,
     );
   }
   if (isServiceUnavailable(err, haystack)) {
     return new PadronError(
       'SERVICE_UNAVAILABLE',
-      `Padrón service is unreachable: ${message || 'no response'}`,
+      `El servicio de Padrón no está disponible: ${message || 'sin respuesta'}`,
     );
   }
   if (body) {
     return new PadronError(
       'UNKNOWN',
-      `Padrón returned an unrecognized SOAP fault: ${message || 'no message'}`,
+      `Padrón devolvió una falla SOAP no reconocida: ${message || 'sin mensaje'}`,
     );
   }
-  return new PadronError('UNKNOWN', `Padrón call failed: ${message || 'no message'}`);
+  return new PadronError('UNKNOWN', `La llamada a Padrón falló: ${message || 'sin mensaje'}`);
 }
 
 function isAuthFault(haystack: string): boolean {
