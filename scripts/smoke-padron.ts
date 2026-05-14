@@ -4,10 +4,11 @@ import { loadConfig } from '../src/config/env.js';
 import { getPersona } from '../src/padron/client.js';
 import type { PersonaPadron } from '../src/padron/types.js';
 
-const LABEL_WIDTH = 16;
+const LABEL_WIDTH = 30;
 
 function pad(label: string): string {
-  return `${label}:`.padEnd(LABEL_WIDTH);
+  const base = `${label}:`.padEnd(LABEL_WIDTH);
+  return base.endsWith(' ') ? base : `${base} `;
 }
 
 function redacted(value: string): string {

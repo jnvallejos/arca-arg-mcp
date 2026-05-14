@@ -187,7 +187,7 @@ async function loadClient(config: ArcaConfig): Promise<WsfexSoapClient> {
   } catch (err) {
     throw new WsfexError(
       'SERVICE_UNAVAILABLE',
-      `Could not load WSFEX WSDL at ${wsdlUrl}: ${(err as Error).message}`,
+      `No se pudo cargar el WSDL de WSFEX en ${wsdlUrl}: ${(err as Error).message}`,
     );
   }
 }
@@ -224,22 +224,22 @@ function mapSoapError(err: SoapErrorLike, op: string): WsfexError {
   if (isAuthFault(haystack)) {
     return new WsfexError(
       'AUTH_FAILED',
-      `WSFEX rejected the WSAA token on ${op}: ${message || 'authentication failure'}`,
+      `WSFEX rechazó el token de WSAA en ${op}: ${message || 'falla de autenticación'}`,
     );
   }
   if (isServiceUnavailable(err, haystack)) {
     return new WsfexError(
       'SERVICE_UNAVAILABLE',
-      `WSFEX service is unreachable on ${op}: ${message || 'no response'}`,
+      `El servicio de WSFEX no está disponible en ${op}: ${message || 'sin respuesta'}`,
     );
   }
   if (body) {
     return new WsfexError(
       'UNKNOWN',
-      `WSFEX returned an unrecognized SOAP fault on ${op}: ${message || 'no message'}`,
+      `WSFEX devolvió una falla SOAP no reconocida en ${op}: ${message || 'sin mensaje'}`,
     );
   }
-  return new WsfexError('UNKNOWN', `WSFEX call ${op} failed: ${message || 'no message'}`);
+  return new WsfexError('UNKNOWN', `La llamada a WSFEX ${op} falló: ${message || 'sin mensaje'}`);
 }
 
 function isAuthFault(haystack: string): boolean {

@@ -80,4 +80,16 @@ describe('formatTaSummary', () => {
     const lines = formatTaSummary(makeTa(), CACHE_PATH, NOW);
     expect(lines[0]).toBe('TA acquired:');
   });
+
+  it('indents body lines with two spaces and aligns labels to a 30-char column', () => {
+    const lines = formatTaSummary(makeTa(), CACHE_PATH, NOW);
+    for (const line of lines.slice(1)) {
+      expect(line.startsWith('  ')).toBe(true);
+      const body = line.slice(2);
+      const match = body.match(/^([^:]+:\s+)\S/);
+      expect(match, `line "${line}" must have aligned label column`).not.toBeNull();
+      const labelColumn = match?.[1] ?? '';
+      expect(labelColumn.length).toBeGreaterThanOrEqual(30);
+    }
+  });
 });

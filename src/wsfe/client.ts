@@ -141,7 +141,7 @@ async function loadClient(config: ArcaConfig): Promise<WsfeSoapClient> {
   } catch (err) {
     throw new WsfeError(
       'SERVICE_UNAVAILABLE',
-      `Could not load WSFE WSDL at ${wsdlUrl}: ${(err as Error).message}`,
+      `No se pudo cargar el WSDL de WSFE en ${wsdlUrl}: ${(err as Error).message}`,
     );
   }
 }
@@ -178,22 +178,22 @@ function mapSoapError(err: SoapErrorLike, op: string): WsfeError {
   if (isAuthFault(haystack)) {
     return new WsfeError(
       'AUTH_FAILED',
-      `WSFE rejected the WSAA token on ${op}: ${message || 'authentication failure'}`,
+      `WSFE rechazó el token de WSAA en ${op}: ${message || 'falla de autenticación'}`,
     );
   }
   if (isServiceUnavailable(err, haystack)) {
     return new WsfeError(
       'SERVICE_UNAVAILABLE',
-      `WSFE service is unreachable on ${op}: ${message || 'no response'}`,
+      `El servicio de WSFE no está disponible en ${op}: ${message || 'sin respuesta'}`,
     );
   }
   if (body) {
     return new WsfeError(
       'UNKNOWN',
-      `WSFE returned an unrecognized SOAP fault on ${op}: ${message || 'no message'}`,
+      `WSFE devolvió una falla SOAP no reconocida en ${op}: ${message || 'sin mensaje'}`,
     );
   }
-  return new WsfeError('UNKNOWN', `WSFE call ${op} failed: ${message || 'no message'}`);
+  return new WsfeError('UNKNOWN', `La llamada a WSFE ${op} falló: ${message || 'sin mensaje'}`);
 }
 
 function isAuthFault(haystack: string): boolean {

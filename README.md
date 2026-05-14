@@ -1,12 +1,14 @@
 # arca-arg-mcp
 
+🇪🇸 [Leer en español](README.es.md)
+
+![Demo: emitting a Factura B via Claude Desktop](docs/demo.gif)
+
 [![CI](https://github.com/jnvallejos/arca-arg-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/jnvallejos/arca-arg-mcp/actions/workflows/ci.yml)
 
 MCP (Model Context Protocol) server for Argentine tax compliance. Exposes ARCA (ex-AFIP) web services as tools usable from Claude Desktop, Claude Code, and any MCP-compatible client.
 
-> **Status: in development.** This repo is being built phase by phase.
-
-## What it will do
+## What it does
 
 - Authenticate with ARCA via WSAA (certificate-based)
 - Validate CUITs against the Padrón web service
@@ -29,6 +31,48 @@ developer who has ever needed to invoice from code has rediscovered the same edg
 the hard way. This project wraps them as MCP tools so an LLM (or any MCP client) can
 drive them with a clean, typed interface, instead of every team rebuilding the same
 auth and signing layer from scratch.
+
+## Architecture
+
+Three layers: the MCP client talks to this server over stdio; the server holds a
+WSAA-issued ticket and uses it to drive the four ARCA SOAP services.
+
+```mermaid
+flowchart LR
+    subgraph Client["MCP Client (Claude Desktop / Claude Code)"]
+        LLM[LLM]
+    end
+
+    subgraph Server["arca-arg-mcp Server (stdio)"]
+        Tools[MCP Tools<br/>arca_emitir_factura<br/>arca_consultar_cuit<br/>...]
+        WSAA[WSAA Auth<br/>TA Cache]
+        WSFE[WSFE Client]
+        WSFEX[WSFEX Client]
+        Padron[Padrón Client]
+    end
+
+    subgraph ARCA["ARCA / ex-AFIP (SOAP)"]
+        WSAAEndpoint[WSAA Endpoint]
+        WSFEEndpoint[WSFE Endpoint]
+        WSFEXEndpoint[WSFEX Endpoint]
+        PadronEndpoint[Padrón A13 Endpoint]
+    end
+
+    LLM -->|tool call| Tools
+    Tools --> WSAA
+    Tools --> WSFE
+    Tools --> WSFEX
+    Tools --> Padron
+    WSAA -->|certificate auth| WSAAEndpoint
+    WSAA -.->|cached TA| Tools
+    WSFE -->|SOAP + TA| WSFEEndpoint
+    WSFEX -->|SOAP + TA| WSFEXEndpoint
+    Padron -->|SOAP + TA| PadronEndpoint
+```
+
+The dotted arrow from WSAA back to Tools represents the cached ticket
+(`ta-<cuit>-<service>.json`) being reused on subsequent calls within its
+~12-hour validity window.
 
 ## Prerequisites
 
@@ -179,7 +223,7 @@ that's confirmed by ARCA itself when the first authentication call succeeds.
 
 ## Running the smoke tests
 
-There are two smoke scripts, runnable individually or as a chained pair:
+There are four smoke scripts, runnable individually or chained together:
 
 - `npm run smoke:wsaa` — exercises the full WSAA flow against ARCA homologation:
   build TRA, sign with PKCS#7 / CMS, call `loginCms`, parse the TA, and write it
@@ -225,9 +269,10 @@ up). To look up a different CUIT, set `SMOKE_CUIT`:
 SMOKE_CUIT=30711111119 npm run smoke:padron
 ```
 
-Both scripts redact sensitive data: `smoke:wsaa` prints token / sign lengths
-only; `smoke:padron` prints field lengths and counts only — never names,
-addresses, or activity descriptions.
+The smoke scripts redact sensitive data: `smoke:wsaa` prints token / sign
+lengths only; `smoke:padron` prints field lengths and counts only — never
+names, addresses, or activity descriptions; `smoke:wsfe` and `smoke:wsfex`
+print the CAE length only, never the CAE itself.
 
 ### Common failures
 
@@ -265,9 +310,7 @@ equivalent path on Linux/Windows):
 }
 ```
 
-Restart Claude Desktop. The available tools (`ping`, `arca_status`,
-`arca_consultar_cuit`, plus whatever future phases add) will appear in the
-chat UI.
+Restart Claude Desktop. The available tools will appear in the chat UI.
 
 ### Tools available
 

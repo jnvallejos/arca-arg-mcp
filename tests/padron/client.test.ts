@@ -199,3 +199,74 @@ describe('getPersona', () => {
     await expect(getPersona('20111111112', makeConfig())).rejects.toBeInstanceOf(PadronError);
   });
 });
+
+describe('getPersona user-facing error messages (Spanish)', () => {
+  beforeEach(() => {
+    getPersonaAsyncMock.mockReset();
+    createClientAsyncMock.mockReset();
+    getValidTokenMock.mockReset();
+    getValidTokenMock.mockResolvedValue(FAKE_TA);
+    createClientAsyncMock.mockResolvedValue({ getPersonaAsync: getPersonaAsyncMock });
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('NOT_FOUND message is in Spanish', async () => {
+    getPersonaAsyncMock.mockRejectedValue(makeFault(notFoundXml, 'No existe persona con ese Id'));
+    const { getPersona } = await import('../../src/padron/client.js');
+    await expect(getPersona('20999999990', makeConfig())).rejects.toMatchObject({
+      message: expect.stringContaining('No se encontró'),
+    });
+  });
+
+  it('AUTH_FAILED message is in Spanish', async () => {
+    const fault = makeFault(
+      '<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
+        '<soap:Body><soap:Fault><faultstring>Token invalido</faultstring></soap:Fault>' +
+        '</soap:Body></soap:Envelope>',
+      'Token invalido',
+    );
+    getPersonaAsyncMock.mockRejectedValue(fault);
+    const { getPersona } = await import('../../src/padron/client.js');
+    await expect(getPersona('20111111112', makeConfig())).rejects.toMatchObject({
+      message: expect.stringMatching(/rechaz[oó].*token/i),
+    });
+  });
+
+  it('SERVICE_UNAVAILABLE message is in Spanish', async () => {
+    getPersonaAsyncMock.mockRejectedValue({
+      message: 'connect ECONNREFUSED',
+      response: { statusCode: 500 },
+    });
+    const { getPersona } = await import('../../src/padron/client.js');
+    await expect(getPersona('20111111112', makeConfig())).rejects.toMatchObject({
+      message: expect.stringContaining('no está disponible'),
+    });
+  });
+
+  it('SERVICE_UNAVAILABLE message for WSDL load failure is in Spanish', async () => {
+    createClientAsyncMock.mockReset();
+    createClientAsyncMock.mockRejectedValue(new Error('ETIMEDOUT'));
+    const { getPersona } = await import('../../src/padron/client.js');
+    await expect(getPersona('20111111112', makeConfig())).rejects.toMatchObject({
+      message: expect.stringContaining('No se pudo cargar el WSDL'),
+    });
+  });
+
+  it('UNKNOWN unrecognized SOAP fault message is in Spanish', async () => {
+    getPersonaAsyncMock.mockRejectedValue(
+      makeFault(
+        '<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
+          '<soap:Body><soap:Fault><faultstring>Algun error raro</faultstring></soap:Fault>' +
+          '</soap:Body></soap:Envelope>',
+        'Algun error raro',
+      ),
+    );
+    const { getPersona } = await import('../../src/padron/client.js');
+    await expect(getPersona('20111111112', makeConfig())).rejects.toMatchObject({
+      message: expect.stringContaining('falla SOAP no reconocida'),
+    });
+  });
+});
