@@ -345,7 +345,7 @@ selector del chat.
   `5`=Consumidor Final, `6`=Monotributo, `7`=No Categorizado,
   `8`=Proveedor del Exterior, `9`=Cliente del Exterior,
   `10`=IVA Liberado Ley 19.640, `13`=Monotributista Social,
-  `15`=IVA No Alcanzado, `16`=Monotributista Trabajador Independiente Promovido.
+  `15`=IVA No Alcanzado, `16`=Monotributo Trabajador Independiente Promovido.
 - **`arca_obtener_ultimo_comprobante`** — devuelve el último número de
   comprobante autorizado para un punto de venta y tipo dados (1 / 6 / 11).
   Útil para saber cuál es el próximo número antes de emitir.
@@ -395,7 +395,7 @@ npm run smoke:wsfex    # solo el smoke de WSFEX — emite una Factura E real (US
 ```
 
 Los scripts `npm run smoke*` **no** están conectados a CI — necesitan un
-certificado real emitido por ARCA. CI corre solo tests unitarios e de
+certificado real emitido por ARCA. CI corre solo tests unitarios y de
 integración.
 
 ## Estructura del proyecto
@@ -412,7 +412,7 @@ arca-arg-mcp/
 │   ├── wsaa/         auth WSAA: armado del TRA, firma CMS, cliente SOAP, caché del TA
 │   ├── wsfe/         WSFE Factura A/B/C: códigos, builder, parser, formatter, cliente SOAP
 │   └── wsfex/        WSFEX Factura E (exportación): códigos, builder, parser, formatter, cliente SOAP
-└── tests/            tests unitarios e de integración con Vitest, espejo de src/
+└── tests/            tests unitarios y de integración con Vitest, espejo de src/
 ```
 
 ## Licencia
