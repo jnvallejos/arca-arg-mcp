@@ -12,6 +12,9 @@ export const WSFEX_ERROR_HINTS: Record<number, string> = {
   608: 'El país de destino no está en la tabla de países permitidos por ARCA. Verificá el código.',
   609: 'La moneda no está habilitada para el comprobante. Verificá el código.',
   650: 'El idioma del comprobante debe ser un código válido (1=Español, 2=Inglés, 3=Portugués).',
+  1671: 'El campo `fechaPago` debe tener formato YYYY-MM-DD.',
+  1672: 'La fecha de pago (`fechaPago`) es obligatoria para concepto 2 (Servicios) y 4 (Otros) en WSFEX. Pasala junto al request de emisión.',
+  1674: 'La fecha de pago (`fechaPago`) debe ser igual o posterior a la fecha de emisión (`fechaComprobante`).',
 };
 
 /**
